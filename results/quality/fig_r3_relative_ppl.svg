@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="360" viewBox="0 0 680 360">
+<rect width="680" height="360" fill="white"/>
+<text x="65" y="32" font-family="Arial" font-size="19" font-weight="bold">R3 vs R0: paired perplexity change</text>
+<text x="65" y="53" font-family="Arial" font-size="12">Llama-3.1-8B, 8 evaluation samples, 95% paired-bootstrap CI</text>
+<path d="M70 80 V295 H570" stroke="#444" fill="none"/>
+<line x1="70" y1="295" x2="570" y2="295" stroke="#eeeeee"/>
+<text x="59" y="299" text-anchor="end" font-family="Arial" font-size="11">0%</text>
+<line x1="70" y1="235" x2="570" y2="235" stroke="#eeeeee"/>
+<text x="59" y="239" text-anchor="end" font-family="Arial" font-size="11">3%</text>
+<line x1="70" y1="175" x2="570" y2="175" stroke="#eeeeee"/>
+<text x="59" y="179" text-anchor="end" font-family="Arial" font-size="11">6%</text>
+<line x1="70" y1="115" x2="570" y2="115" stroke="#eeeeee"/>
+<text x="59" y="119" text-anchor="end" font-family="Arial" font-size="11">9%</text>
+<path d="M155 285.8 V223.2 M148 285.8 h14 M148 223.2 h14" stroke="#b8404c" stroke-width="2"/>
+<circle cx="155" cy="252.8" r="5" fill="#b8404c"/>
+<text x="155" y="317" text-anchor="middle" font-family="Arial" font-size="12">512</text>
+<path d="M315 275.1 V178.5 M308 275.1 h14 M308 178.5 h14" stroke="#b8404c" stroke-width="2"/>
+<circle cx="315" cy="227.5" r="5" fill="#b8404c"/>
+<text x="315" y="317" text-anchor="middle" font-family="Arial" font-size="12">2,048</text>
+<path d="M475 232.8 V107.2 M468 232.8 h14 M468 107.2 h14" stroke="#b8404c" stroke-width="2"/>
+<circle cx="475" cy="166.4" r="5" fill="#b8404c"/>
+<text x="475" y="317" text-anchor="middle" font-family="Arial" font-size="12">16,384</text>
+<text x="255" y="347" font-family="Arial" font-size="12">Prefix length (tokens)</text>
+</svg>

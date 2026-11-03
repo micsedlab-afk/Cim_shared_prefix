@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="440" viewBox="0 0 740 440">
+<rect width="740" height="440" fill="white"/>
+<text x="75" y="32" font-family="Arial" font-size="19" font-weight="bold">Evaluated Llama-3.1-8B quality (n=8)</text>
+<text x="75" y="54" font-family="Arial" font-size="12">BF16 vs Q4/K4 and mapped macro response; suffix=128, batch=1</text>
+<path d="M85 70 V385 H560" stroke="#444" stroke-width="1.2" fill="none"/>
+<line x1="85" y1="385.0" x2="560" y2="385.0" stroke="#ededed"/>
+<text x="70" y="389.0" text-anchor="end" font-family="Arial" font-size="11">3</text>
+<line x1="85" y1="303.0" x2="560" y2="303.0" stroke="#ededed"/>
+<text x="70" y="307.0" text-anchor="end" font-family="Arial" font-size="11">5</text>
+<line x1="85" y1="221.0" x2="560" y2="221.0" stroke="#ededed"/>
+<text x="70" y="225.0" text-anchor="end" font-family="Arial" font-size="11">7</text>
+<line x1="85" y1="139.0" x2="560" y2="139.0" stroke="#ededed"/>
+<text x="70" y="143.0" text-anchor="end" font-family="Arial" font-size="11">9</text>
+<text x="115" y="410" text-anchor="middle" font-family="Arial" font-size="12">512</text>
+<text x="320" y="410" text-anchor="middle" font-family="Arial" font-size="12">2,048</text>
+<text x="525" y="410" text-anchor="middle" font-family="Arial" font-size="12">16,384</text>
+<path d="M115,233.34 L320,283.29 L525,296.68" fill="none" stroke="#24374a" stroke-width="2.3"/>
+<path d="M115 300.49 V143.63 M111 300.49 h8 M111 143.63 h8" stroke="#24374a" stroke-width="1.25" opacity=".8"/>
+<circle cx="115" cy="233.34" r="3.5" fill="#24374a"/>
+<path d="M320 338.38 V209.08 M316 338.38 h8 M316 209.08 h8" stroke="#24374a" stroke-width="1.25" opacity=".8"/>
+<circle cx="320" cy="283.29" r="3.5" fill="#24374a"/>
+<path d="M525 351.70 V219.92 M521 351.70 h8 M521 219.92 h8" stroke="#24374a" stroke-width="1.25" opacity=".8"/>
+<circle cx="525" cy="296.68" r="3.5" fill="#24374a"/>
+<line x1="595" y1="113" x2="618" y2="113" stroke="#24374a" stroke-width="3"/>
+<text x="627" y="117" font-family="Arial" font-size="13">R0</text>
+<path d="M115,232.42 L320,279.88 L525,292.49" fill="none" stroke="#2580a3" stroke-width="2.3"/>
+<path d="M115 299.25 V143.51 M111 299.25 h8 M111 143.51 h8" stroke="#2580a3" stroke-width="1.25" opacity=".8"/>
+<circle cx="115" cy="232.42" r="3.5" fill="#2580a3"/>
+<path d="M320 335.56 V205.60 M316 335.56 h8 M316 205.60 h8" stroke="#2580a3" stroke-width="1.25" opacity=".8"/>
+<circle cx="320" cy="279.88" r="3.5" fill="#2580a3"/>
+<path d="M525 348.92 V213.30 M521 348.92 h8 M521 213.30 h8" stroke="#2580a3" stroke-width="1.25" opacity=".8"/>
+<circle cx="525" cy="292.49" r="3.5" fill="#2580a3"/>
+<line x1="595" y1="141" x2="618" y2="141" stroke="#2580a3" stroke-width="3"/>
+<text x="627" y="145" font-family="Arial" font-size="13">R1</text>
+<path d="M115,229.27 L320,272.53 L525,285.58" fill="none" stroke="#e18b34" stroke-width="2.3"/>
+<path d="M115 297.41 V138.52 M111 297.41 h8 M111 138.52 h8" stroke="#e18b34" stroke-width="1.25" opacity=".8"/>
+<circle cx="115" cy="229.27" r="3.5" fill="#e18b34"/>
+<path d="M320 329.10 V196.05 M316 329.10 h8 M316 196.05 h8" stroke="#e18b34" stroke-width="1.25" opacity=".8"/>
+<circle cx="320" cy="272.53" r="3.5" fill="#e18b34"/>
+<path d="M525 342.26 V204.73 M521 342.26 h8 M521 204.73 h8" stroke="#e18b34" stroke-width="1.25" opacity=".8"/>
+<circle cx="525" cy="285.58" r="3.5" fill="#e18b34"/>
+<line x1="595" y1="169" x2="618" y2="169" stroke="#e18b34" stroke-width="3"/>
+<text x="627" y="173" font-family="Arial" font-size="13">R2</text>
+<path d="M115,227.54 L320,275.70 L525,283.10" fill="none" stroke="#b8404c" stroke-width="2.3"/>
+<path d="M115 296.61 V139.67 M111 296.61 h8 M111 139.67 h8" stroke="#b8404c" stroke-width="1.25" opacity=".8"/>
+<circle cx="115" cy="227.54" r="3.5" fill="#b8404c"/>
+<path d="M320 330.18 V205.51 M316 330.18 h8 M316 205.51 h8" stroke="#b8404c" stroke-width="1.25" opacity=".8"/>
+<circle cx="320" cy="275.70" r="3.5" fill="#b8404c"/>
+<path d="M525 340.44 V203.47 M521 340.44 h8 M521 203.47 h8" stroke="#b8404c" stroke-width="1.25" opacity=".8"/>
+<circle cx="525" cy="283.10" r="3.5" fill="#b8404c"/>
+<line x1="595" y1="197" x2="618" y2="197" stroke="#b8404c" stroke-width="3"/>
+<text x="627" y="201" font-family="Arial" font-size="13">R3</text>
+<text x="285" y="434" font-family="Arial" font-size="12">Prefix length (tokens)</text>
+<text x="17" y="240" transform="rotate(-90 17 240)" font-family="Arial" font-size="12">Perplexity</text>
+</svg>

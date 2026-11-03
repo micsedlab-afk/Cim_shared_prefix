@@ -1,0 +1,65 @@
+{
+  "schema": "quality_workload_profiles/v1",
+  "evidence_class": "source_grounded_geometry_only",
+  "profiles": [
+    {
+      "model_id": "meta-llama/Llama-3.1-8B",
+      "revision": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b",
+      "query_heads": 32,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "layers": 32,
+      "max_positions": 131072,
+      "sliding_window": null,
+      "source_url": "https://huggingface.co/meta-llama/Llama-3.1-8B/blob/d04e592bb4f6aa9cfee91e2e20afa771667e1d4b/config.json"
+    },
+    {
+      "model_id": "mistralai/Mistral-7B-v0.1",
+      "revision": "17688039ea7b7001c702797eed2ab7716a0cc3c2",
+      "query_heads": 32,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "layers": 32,
+      "max_positions": 32768,
+      "sliding_window": 4096,
+      "source_url": "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/17688039ea7b7001c702797eed2ab7716a0cc3c2/config.json"
+    },
+    {
+      "model_id": "facebook/opt-2.7b",
+      "revision": "main (config; re-pin before execution)",
+      "query_heads": 32,
+      "kv_heads": 32,
+      "head_dim": 80,
+      "layers": 32,
+      "max_positions": 2048,
+      "sliding_window": null,
+      "source_url": "https://huggingface.co/facebook/opt-2.7b/blob/main/config.json"
+    }
+  ],
+  "sweep": {
+    "prefix_policy": "source-context-compatible (OPT 256/512/1024, others 512/2048/16384)",
+    "suffixes": [
+      32,
+      128,
+      256
+    ],
+    "batches": [
+      1,
+      8,
+      128
+    ],
+    "output_tokens": [
+      16,
+      128,
+      256
+    ],
+    "gqa_ratios": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "rows": 972,
+    "quality_evaluated": false
+  }
+}

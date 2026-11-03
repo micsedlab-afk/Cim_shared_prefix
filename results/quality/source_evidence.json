@@ -1,0 +1,51 @@
+{
+  "schema": "cim_quality_source_evidence/v1",
+  "recovered_from": {
+    "repository": "micsedlab-afk/shared_prefix_cim",
+    "branch": "results/final-quality-scalar-n8-20260923",
+    "directory": "results/sram2llm/final_quality_scalar/",
+    "top_level_commit": "a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4"
+  },
+  "record_classification": "evaluated_model_quality_with_emulated_circuit_response",
+  "measured_on_silicon": false,
+  "evaluated_units": 96,
+  "archive_reconciled_groups": 12,
+  "max_abs_group_nll_sum_error": 0,
+  "model": {
+    "id": "meta-llama/Llama-3.1-8B",
+    "revision": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b"
+  },
+  "dataset": {
+    "id": "Salesforce/wikitext",
+    "config": "wikitext-2-raw-v1",
+    "split": "validation",
+    "revision": "b08601e04326c79dfdd32d625aee71d232d685c3"
+  },
+  "batch": 1,
+  "suffix_tokens": 128,
+  "prefix_lengths": [
+    512,
+    2048,
+    16384
+  ],
+  "samples": "held_out_evaluation_sample",
+  "sample_count": 8,
+  "bootstrap": {
+    "seed": 20260917,
+    "resamples": 10000,
+    "confidence": 0.95
+  },
+  "digitized_circuit_source": "Sinangil et al., JSSC 2021 DOI 10.1109/JSSC.2020.3031290, Fig.16 simulated curve",
+  "adc_policy": "sinangil_static_per_layer_r3aware_nearest_o4_v2",
+  "source_pdf_sha256": "3c1674088344b47d9255fcdbe8edf5a6b6ba060c6a16da6cebf6948bdcf39eef",
+  "source_protocol_sha256": "a3bd71c91b666f97d71535a84e8749c4b890e23a8f8b716e1ae6aca97692271b",
+  "provenance_artifact_sha256": {
+    "sample_arm_n8.csv": "e1e54ceb11461096b23fbd396b574da6f160fe72a9ab22aad3a6ce6c25dfd23f",
+    "sample_effects_n8.csv": "b812e5a0647d2c0219bc517cdec81e6e9e2808eb94d51d63d2a16fcf9e3b61ec",
+    "summary_n8.json": "ec28805e6fd60bc68af71287595f2a272c573cec600ddc4753ea035648845e3e",
+    "summary_n8.md": "0105b17bf07f97bc08e4bdc6a9cf3042a84c2f6fc1872ad10c1be36c9f0a9c41",
+    "timing_n8.json": "89e545f21ebdb84351fcfd120fbe9bfe85dc434db8b7050bd2b671f4677ef615"
+  },
+  "raw_archive_committed": false,
+  "missing_evaluations": "Mistral, OPT, batch>1, other suffix and output lengths, counterfactual GQA"
+}
