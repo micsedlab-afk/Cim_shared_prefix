@@ -1,0 +1,53 @@
+{
+  "scope": "conditional parameter sensitivity, not physical digital iso-area or measured latency",
+  "technology_nm": 7,
+  "storage_sources": {
+    "SRAM": {
+      "doi": "https://doi.org/10.1109/VLSICircuits18222.2020.9162985",
+      "macro_capacity_bits": 262144,
+      "macro_area_mm2": 0.008977534246575342,
+      "area_basis": "published 29.2 Mb/mm2 complete macro density, 512x512"
+    },
+    "CIM": {
+      "doi": "https://doi.org/10.1109/ISSCC19947.2020.9062985",
+      "macro_capacity_bits": 4096,
+      "macro_area_mm2": 0.0032,
+      "signed_storage_factor": 2,
+      "native_evaluations_per_signed_Q4xK4": 4,
+      "published_4b4b_GOPS": 372.4,
+      "ops_per_native_MAV": 2
+    }
+  },
+  "rows": 2304,
+  "status_counts": {
+    "conditional_break_even": 1472,
+    "no_compute_time": 736,
+    "no_core_area": 96
+  },
+  "bounds": {
+    "CIM_support_mm2": [
+      0,
+      100
+    ],
+    "digital_support_mm2": [
+      0,
+      200
+    ],
+    "SRAM_aggregate_Bps": [
+      1000000000000.0,
+      8000000000000.0,
+      32000000000000.0
+    ],
+    "score_link_Bps": 1000000000000.0,
+    "reduction_adds_per_s": 1000000000000.0,
+    "target_time": "2x or 4x max(CIM macro-only compute floor, score-link transfer floor)",
+    "overlap_policy": "serial; controller latency=0 optimistic lower bound"
+  },
+  "excluded": [
+    "physical digital MAC area",
+    "7nm synthesis",
+    "unverified SCALE-Sim measurement",
+    "chip-area per MAC division",
+    "actual completed-score CIM system measurement"
+  ]
+}
