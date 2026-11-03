@@ -34,6 +34,11 @@ class SystemLegacy(unittest.TestCase):
         self.w = Workload(1, 128, 32, 8, 2, 64, 4, 8)
         self.params = SystemInputs(1e9,1e10,1e10,.005,.008,0.,1e-9,0.,'test synthetic parameters','test synthetic GPU')
 
+    def test_16_gib_large_completed_scores(self):
+        # Workstream contract: 32 layers, batch=1024, 32 heads, prefix=4096, FP32 scores.
+        large=Workload(1024,4096,0,32,32,128,32,1)
+        self.assertEqual(ScoreInterface().bytes_per_generated_token(large),16*2**30)
+
     def test_full_breakdown(self):
         r = evaluate_system(self.w, self.params)
         self.assertGreater(r.physical_qk_compute_s, 0)
