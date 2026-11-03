@@ -9,8 +9,8 @@ Outputs: prefix placement/refill, merge, transfer, per-stage nonoverlap/overlap 
 
 ## Work/area-digital
 Ownership: `src/cim_shared_prefix/area_optimizer.py`, `tests/test_area_optimizer.py`, `docs/area_method.md`.
-Inputs: published macro specifications; explicit digital MAC/core/scratch/controller cost sources; standard `AreaLedger`.
-Outputs: feasible iso-area alternatives and constrained bank/compute allocation with winning-region analysis. No foundry synthesis.
+Inputs: published macro specifications; documented complete-block digital evidence, without inferred MAC area from whole-chip publications; standard `AreaLedger`.
+Outputs: only source-qualified iso-area alternatives; otherwise the required digital throughput/area break-even boundary and labeled area sensitivity. No foundry synthesis.
 
 ## Work/quality-workloads
 Ownership: `src/cim_shared_prefix/quality.py`, `src/cim_shared_prefix/profiles.py`, `tests/test_quality.py`, `docs/quality_method.md`.
@@ -25,5 +25,5 @@ Integrate workstreams only after tests; preserve source/provenance; full 728-poi
 - Unit tests pass; no hard-coded made-up calibration data.
 - Model 32-bit per-score transfer at the standard large geometry equals 16 GiB for 32 layers.
 - Signed split Q4/K4 storage and native call multipliers carried through area and latency.
-- Every numerical scenario reports all four comparators at matched integrated area.
+- Every numerical scenario reports source-qualified alternatives; digital may only appear as a conditional bound without qualifying area evidence.
 - Missing data are marked unsupported; no silently omitted transfers or zero-valued unsupported energy.
