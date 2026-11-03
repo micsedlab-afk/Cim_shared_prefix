@@ -5,9 +5,9 @@ Integrated source-grounded SRAM, SRAM-CIM and SRAM + digital-MAC analysis for sh
 ## Scope
 
 - Study one completed-score endpoint: QK score available to scale/softmax.
-- Compare GPU, SRAM-only, digital SRAM+MAC, and SRAM-CIM at matched **total modeled area**.
+- Compare GPU, SRAM-only and SRAM-CIM at fully documented modeled area. Include SRAM+digital MAC only as a matched-area implementation when complete comparable physical area evidence exists; otherwise publish a conditional digital break-even threshold.
 - Include prefix placement/refill, mapping, signed arithmetic, reduction, score transport and complete decoder latency.
-- Model support-circuit area using published or explicit parametric assumptions. **No 7-nm synthesis.**
+- Classify all physical area evidence. Sensitivity parameters never qualify as physically comparable area. **No 7-nm synthesis and no invented digital-MAC area.**
 - Generate architectural comparisons and absolute numerical-quality evidence from preserved project data.
 
 ## Frozen ladder
@@ -20,7 +20,7 @@ Integrated source-grounded SRAM, SRAM-CIM and SRAM + digital-MAC analysis for sh
 
 Independent implementation branches: `work/system-path`, `work/area-digital`, `work/quality-workloads`. Integration: `integration/final-framework`.
 
-All branches start from `main`. Do not change another workstream's files; merge into integration only after executable tests.
+All branches start from `main`. Read `docs/AREA_EVIDENCE_POLICY.md` first. Do not change another workstream's files; merge into integration only after executable tests.
 
 ## Source acquisition
 
