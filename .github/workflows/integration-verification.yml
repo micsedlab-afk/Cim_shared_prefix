@@ -6,15 +6,30 @@ on:
 jobs:
   repository-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Scientific Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy matplotlib
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: Full repository test suite
         run: python -m unittest discover -s tests -v
       - name: Source-grounded reproducibility
         run: |
-          python scripts/run_source_sweep.py --help
-          python scripts/run_residency_sweep.py --help
+          PYTHONPATH=src python scripts/run_source_sweep.py /tmp/source-grounded
+          PYTHONPATH=src python scripts/run_residency_sweep.py /tmp/physical-residency
+          python scripts/export_quality_workloads.py --out /tmp/quality-geometry --profile-only
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integrated-source-reproducibility
+          path: |
+            /tmp/source-grounded
+            /tmp/physical-residency
+            /tmp/quality-geometry
+          if-no-files-found: ignore
