@@ -62,7 +62,8 @@ def study(args):
                     w=Workload(1,2048,128,32,8,128,32,o)
                     pipe=resident_pipeline(
                         w,area_mm2=budget,support_mm2=args.support_mm2,
-                        active_ports=ports,rates=rates,\n                        operand_stage_support_mm2=args.operand_staging_mm2)
+                        active_ports=ports,rates=rates,
+                        operand_stage_support_mm2=args.operand_staging_mm2)
                     for setup_us in args.setups_us:
                         base={
                             "model":"meta-llama/Llama-3.1-8B",
@@ -70,7 +71,8 @@ def study(args):
                             "physical_macro":"Sinangil_7nm_Q4K4_posneg_O4",
                             "P":2048,"suffix":128,"B":1,"O":o,
                             "budget_mm2":budget,
-                            "external_area_sensitivity_mm2":args.support_mm2,\n                            "operand_staging_reserved_mm2":args.operand_staging_mm2,
+                            "external_area_sensitivity_mm2":args.support_mm2,
+                            "operand_staging_reserved_mm2":args.operand_staging_mm2,
                             "port_cap_sensitivity":ports,
                             "all_interfaces_Bps_sensitivity":bw,
                             "extra_gpu_to_cim_setup_us_per_layer":setup_us,
@@ -145,7 +147,8 @@ def study(args):
         "cim_model":"published 7nm Sinangil signed positive-negative split; 4 unsigned accesses; 2 K banks",
         "source_support":"published 7nm Yokoyama SRAM density; buffer size charged in macro granularity",
         "assumptions":{
-            "area_support_mm2":args.support_mm2,\n            "operand_staging_within_support_mm2":args.operand_staging_mm2,
+            "area_support_mm2":args.support_mm2,
+            "operand_staging_within_support_mm2":args.operand_staging_mm2,
             "rates_digital_adds_and_scales_per_s":1e12,
             "GPU_prefix_score_assembly_and_Q4_quantization_overhead":"explicit setup sensitivity; zero for reference",
             "pipeline_stage_resources":"independent unsigned array, scaling, reduction and output",
