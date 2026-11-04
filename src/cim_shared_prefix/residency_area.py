@@ -124,6 +124,22 @@ class Residency:
     physical_full_layer_bytes: int
     valid_key_layer_bytes: int
 
+    @property
+    def first_token_programming_bytes(self) -> int:
+        per_layer = (self.physical_full_layer_bytes if self.programming_policy == 'full_macros'
+                     else self.valid_key_layer_bytes)
+        layers = (self.programming_visits_total -
+                  (self.output_tokens - 1) * (self.layout.all_layer_macros //
+                    self.layout.full_layer_macros - self.pinned_layers))
+        return layers * per_layer
+
+    @property
+    def steady_token_programming_bytes(self) -> int:
+        per_layer = (self.physical_full_layer_bytes if self.programming_policy == 'full_macros'
+                     else self.valid_key_layer_bytes)
+        return (self.layout.all_layer_macros // self.layout.full_layer_macros -
+                self.pinned_layers) * per_layer
+
 
 def residency_plan(workload: Workload, *, kind: Kind, budget_mm2: float,
                    support: ExternalArea, pinned_layers: int = 0,
@@ -345,6 +361,10 @@ class Boundary:
     minimum_output_Bps: float
     required_mac_per_s_per_mm2: float | None
     qualified_digital_isoarea: bool = False
+
+    def __post_init__(self):
+        if self.qualified_digital_isoarea:
+            raise ValueError('conditional MAC-area requirement cannot qualify digital iso-area')
 
 
 def boundary(workload: Workload, plan: Residency, rates: RateSet,
