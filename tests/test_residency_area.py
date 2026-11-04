@@ -104,6 +104,18 @@ class ResidencyTests(unittest.TestCase):
         z=residency_plan(wlong,kind='sram',budget_mm2=16,support=zero(),pinned_layers=16)
         self.assertLess(z.programming_bytes_per_generated_token,p.programming_bytes_per_generated_token)
 
+    def test_first_token_and_steady_programming_totals(self):
+        w=large(out=16)
+        p=residency_plan(w,kind='sram',budget_mm2=16,support=zero(),pinned_layers=16)
+        self.assertEqual(p.first_token_programming_bytes,32*p.valid_key_layer_bytes)
+        self.assertEqual(p.steady_token_programming_bytes,16*p.valid_key_layer_bytes)
+        self.assertEqual(p.programming_bytes_total,
+                         p.first_token_programming_bytes+15*p.steady_token_programming_bytes)
+        z=residency_plan(w,kind='sram',budget_mm2=16,support=zero(),pinned_layers=32,
+                         cold_start=False)
+        self.assertEqual(z.first_token_programming_bytes,0)
+        self.assertEqual(z.steady_token_programming_bytes,0)
+
     def test_no_pins_all_layers_reprogram_each_token(self):
         w=large()
         p=residency_plan(w,kind='cim',budget_mm2=16,support=zero(),pinned_layers=0)
