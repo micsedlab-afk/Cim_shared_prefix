@@ -2,7 +2,11 @@ name: Integrated science gates
 on:
   push:
     branches: [integration/final-framework]
+    paths-ignore:
+      - 'results/integration/**'
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   repository-tests:
     runs-on: ubuntu-latest
@@ -25,6 +29,17 @@ jobs:
           PYTHONPATH=src python scripts/run_residency_sweep.py /tmp/physical-residency
           python scripts/export_quality_workloads.py --out /tmp/quality-geometry --profile-only
           PYTHONPATH=src python scripts/run_integrated_architecture.py /tmp/integrated-architecture
+      - name: Commit deterministic integrated architecture results
+        run: |
+          mkdir -p results/integration
+          cp -a /tmp/integrated-architecture/. results/integration/
+          git add results/integration
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "results: regenerate qualified conditional physical envelope"
+            git push origin HEAD:integration/final-framework
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
