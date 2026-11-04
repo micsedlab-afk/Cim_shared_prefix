@@ -119,6 +119,21 @@ class SelectivePipelineTests(unittest.TestCase):
         self.assertGreaterEqual(t,100.0)
         self.assertLessEqual(t,sum(13.0 for _ in range(10)))
 
+    def test_batched_microquery_tiling_improves_bounded_latency(self):
+        w=Workload(8,2048,128,32,8,128,32,128)
+        p=resident_pipeline(
+            w,area_mm2=16,support_mm2=.5,active_ports=256,
+            rates=R,operand_stage_support_mm2=.1,
+        )
+        self.assertIsNotNone(p)
+        self.assertLess(p.microbatch_size,8)
+        self.assertLess(p.warm_pipelined_s_per_layer,45e-6)
+        self.assertLessEqual(p.physical_stage_buffer_area_mm2,.1)
+        self.assertEqual(sum(wave.scores for wave in p.waves),
+                         w.batch*w.query_heads*w.prefix_tokens)
+        self.assertEqual(p.macro_count_one_layer,4096)
+        self.assertTrue(all(wave.native_cycles%2==0 for wave in p.waves))
+
     def test_geometry_and_rate_fail_closed(self):
         with self.assertRaises(ValueError):
             self.make_pipeline(ports=0)
