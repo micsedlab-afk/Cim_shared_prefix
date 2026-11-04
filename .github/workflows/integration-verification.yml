@@ -1,7 +1,7 @@
 name: GPU evidence and integrated regression
 on:
   push:
-    branches: [integration/final-framework]
+    branches: [integration/final-framework, research/prefix-context-offload-20261104]
     paths-ignore:
       - 'results/integration/**'
       - 'results/gpu/**'
@@ -162,4 +162,38 @@ jobs:
           path: |
             /tmp/grouped-gpu-vs-selective-cim.csv
             /tmp/grouped-gpu-vs-selective-cim.json
+          if-no-files-found: error
+
+      - name: Execute finite BF16 V SRAM + stable softmax PV 7nm prefix-context model
+        run: |
+          python scripts/run_prefix_context_sweep.py \
+            --batches 1,2,4,8 --areas 15,16 --ports 128,256 \
+            --v-bw-TBps 1,2,4,8,16,32 --mac-Tper-s 4,16,64 \
+            --outputs 32,128 \
+            --csv /tmp/7nm-prefix-context-frontier.csv \
+            --json /tmp/7nm-prefix-context-frontier.json
+          python - <<'PY'
+          import json,csv
+          z=json.load(open('/tmp/7nm-prefix-context-frontier.json'))
+          assert z['cases']==576
+          r=z['reference_B1']
+          assert r['cim_k_macros']==4096
+          assert r['sram_v_macros']==128
+          assert r['full_v_bytes_per_layer']==4194304
+          assert r['prefix_score_link_bytes_avoided']==262144
+          assert r['context_and_lse_link_bytes']==8320
+          assert r['total_physical_area_mm2']<=16
+          assert r['cold_KV_supply_and_program_s']>0
+          with open('/tmp/7nm-prefix-context-frontier.csv') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==576
+          assert all(row['hardware_speedup']=='' for row in rows)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-source-7nm-prefix-context-SRAM-V-digital-PV-frontier
+          path: |
+            /tmp/7nm-prefix-context-frontier.csv
+            /tmp/7nm-prefix-context-frontier.json
           if-no-files-found: error
