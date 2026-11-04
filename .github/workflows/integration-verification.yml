@@ -164,7 +164,7 @@ jobs:
             /tmp/grouped-gpu-vs-selective-cim.json
           if-no-files-found: error
 
-      - name: Execute finite BF16 V SRAM + stable softmax PV 7nm prefix-context model
+      - name: Execute finite FP16 V SRAM + stable softmax PV 7nm prefix-context model
         run: |
           python scripts/run_prefix_context_sweep.py \
             --batches 1,2,4,8 --areas 15,16 --ports 128,256 \
