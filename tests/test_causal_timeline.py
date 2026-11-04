@@ -2,6 +2,9 @@
 import unittest
 from dataclasses import replace
 from math import isclose
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from cim_shared_prefix.contracts import Workload
 from cim_shared_prefix.integrated_schedule import SerialRates, best_serial
