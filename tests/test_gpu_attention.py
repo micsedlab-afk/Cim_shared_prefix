@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import torch
 from cim_shared_prefix.gpu_attention import (
     check_inputs, full_kv, full_sdpa, grouped_prefix_scores,
-    shared_prefix_gemm_attention,
+    shared_prefix_gemm_attention, completed_prefix_scores_gpu_remainder,
 )
 
 
@@ -42,8 +42,12 @@ class AttentionKernelsTests(unittest.TestCase):
                     ss = grouped_prefix_scores(q, pk)
                     expected = torch.matmul(q, pk.repeat_interleave(hq // hk, dim=0)
                                              .unsqueeze(0).expand(b,-1,-1,-1)
-                                             .transpose(-1,-2)).squeeze(-2) / (d**.5)
+                                             .transpose(-1,-2)).squeeze(-2)
                     self.assertTrue(torch.allclose(ss, expected, atol=1e-5, rtol=1e-5))
+                    gpu_remainder = completed_prefix_scores_gpu_remainder(q, ss.float(), pv, sk, sv)
+                    self.assertTrue(torch.allclose(gpu_remainder, native, atol=1e-5, rtol=1e-5))
+                    with self.assertRaises(ValueError):
+                        completed_prefix_scores_gpu_remainder(q, ss.half(), pv, sk, sv)
 
     def test_attention_rejects_mismatched_head_and_precision(self):
         q = torch.randn(1, 6, 1, 16)

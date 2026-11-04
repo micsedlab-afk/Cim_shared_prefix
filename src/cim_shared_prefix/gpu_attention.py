@@ -64,7 +64,7 @@ def grouped_prefix_scores(q, pk):
     # B*GQA query rows share one K copy per physical KV head.
     qs = q[:, :, 0].reshape(b, hk, ratio, d).permute(1, 0, 2, 3)
     qs = qs.reshape(hk, b * ratio, d).contiguous()
-    scores = torch.bmm(qs, pk.transpose(-1, -2)) * (1.0 / sqrt(d))
+    scores = torch.bmm(qs, pk.transpose(-1, -2))
     return scores.reshape(hk, b, ratio, p).permute(1, 0, 2, 3).reshape(b, hq, p)
 
 
@@ -115,3 +115,39 @@ def make_candidate(name: str):
         return torch.compile(shared_prefix_gemm_attention, mode="reduce-overhead",
                              fullgraph=True)
     raise ValueError("unknown candidate")
+
+
+def completed_prefix_scores_gpu_remainder(q, completed_prefix_qk, pv, sk, sv):
+    """GPU suffix QK + completed-prefix softmax/PV + logsumexp fusion.
+
+    The supplied prefix scores are unscaled completed FP32 transfer words
+    ALREADY GPU-resident; transfer and CIM time are separate physical stages.
+    """
+    b, hq, hk, d, p, u = check_inputs(q, pv, pv, sk, sv)
+    if completed_prefix_qk.shape != (b, hq, p) or completed_prefix_qk.dtype != torch.float32:
+        raise ValueError("completed QK must be FP32 unscaled GPU-resident words")
+    if completed_prefix_qk.device != q.device:
+        raise ValueError("score GPU residency mismatch")
+    g = hq // hk
+    alpha = 1.0 / sqrt(d)
+    if p:
+        ps = (completed_prefix_qk.reshape(b, hk, g, p)
+              .permute(1, 0, 2, 3).reshape(hk, b*g, p) * alpha)
+        plse = torch.logsumexp(ps, dim=-1).reshape(hk, b, g).permute(1, 0, 2)
+        pp = torch.softmax(ps, dim=-1).to(q.dtype)
+        pout = torch.bmm(pp, pv).reshape(hk, b, g, d).permute(1, 0, 2, 3).float()
+    else:
+        plse = torch.full((b,hk,g), float("-inf"), dtype=torch.float32, device=q.device)
+        pout = torch.zeros((b,hk,g,d), dtype=torch.float32, device=q.device)
+    if u:
+        qg = q[:, :, 0].reshape(b*hk, g, d).contiguous()
+        ss = torch.bmm(qg, sk.reshape(b*hk,u,d).transpose(-1,-2)).float() * alpha
+        slse = torch.logsumexp(ss, dim=-1).reshape(b,hk,g)
+        sp = torch.softmax(ss, dim=-1).to(q.dtype)
+        sout = torch.bmm(sp, sv.reshape(b*hk,u,d)).reshape(b,hk,g,d).float()
+    else:
+        slse = torch.full((b,hk,g), float("-inf"), dtype=torch.float32, device=q.device)
+        sout = torch.zeros((b,hk,g,d), dtype=torch.float32, device=q.device)
+    denom = torch.logaddexp(plse, slse)
+    return (torch.exp(plse-denom).unsqueeze(-1)*pout +
+            torch.exp(slse-denom).unsqueeze(-1)*sout).reshape(b,hq,1,d).to(q.dtype)

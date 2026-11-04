@@ -37,7 +37,7 @@ from torch.nn.attention import SDPBackend, sdpa_kernel
 
 from cim_shared_prefix.profiles import PROFILES, visible_prefix
 from cim_shared_prefix.gpu_attention import (
-    full_kv, full_sdpa, grouped_prefix_scores, make_candidate,
+    full_kv, full_sdpa, grouped_prefix_scores, completed_prefix_scores_gpu_remainder, make_candidate,
     shared_prefix_gemm_attention,
 )
 from cim_shared_prefix.hydragen_reference import prefix_suffix_attention
@@ -149,6 +149,9 @@ def run_case(profile, *, batch, prefix, suffix, output_tokens, step,
     pk, pv = sample((hk, p, d)), sample((hk, p, d))
     sk, sv = sample((batch, hk, s, d)), sample((batch, hk, s, d))
     k, v = full_kv(q, pk, pv, sk, sv)
+    # Completed, unscaled 32-bit score words physically resident on GPU.
+    # Score transfer from CIM must be charged by the architecture model.
+    injected_completed_scores = grouped_prefix_scores(q, pk).float()
     expected = prefix_suffix_attention(q[:, :, 0], pk, pv, sk, sv)
     with sdpa_kernel([SDPBackend.FLASH_ATTENTION]):
         flash = full_sdpa(q, k, v)
@@ -164,11 +167,16 @@ def run_case(profile, *, batch, prefix, suffix, output_tokens, step,
         "native_gqa_ratio": profile.gqa_ratio, "precision": precision,
         "batch": batch, "head_dim": d, "query_heads": hq, "kv_heads": hk,
         "reference_absolute_error": err_baseline,
+        "completed_score_word_bits": 32,
+        "GPU_remainder_input": "unscaled FP32 completed QK scores resident on GPU; physical output-link excluded",
         "source_data": "random tensor activations; actual GPU CUDA event kernels, NOT pretrained inference",
         "measurements": [], "status": "MEASURED_ATTENTION_KERNEL_ONLY",
     }
     mode_names = [("full_flash_sdpa", lambda: full_sdpa(q, k, v)),
-                  ("prefix_qk_only", lambda: grouped_prefix_scores(q, pk))]
+                  ("prefix_qk_only", lambda: grouped_prefix_scores(q, pk)),
+                  ("gpu_score_to_attention_remainder",
+                   lambda: completed_prefix_scores_gpu_remainder(
+                       q, injected_completed_scores, pv, sk, sv))]
     for name in candidates:
         if name == "compiled_grouped_gemm":
             mode_names.append((name, make_candidate(name)))
@@ -178,7 +186,7 @@ def run_case(profile, *, batch, prefix, suffix, output_tokens, step,
             raise ValueError("invalid candidate " + name)
     for mode in modes:
         for name, base_fn in mode_names:
-            fn = base_fn if name in ("full_flash_sdpa", "prefix_qk_only") else (
+            fn = base_fn if name in ("full_flash_sdpa", "prefix_qk_only", "gpu_score_to_attention_remainder") else (
                 lambda call=base_fn: call(q, pk, pv, sk, sv))
             if name == "prefix_qk_only":
                 endpoint = "prefix_completed_QK_scores_pre_scale_softmax"
