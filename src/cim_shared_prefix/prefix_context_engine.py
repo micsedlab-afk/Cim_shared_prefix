@@ -267,7 +267,7 @@ def simulate_prefix_context(
         active_macro_ports=usable_ports,wave_groups=width,
         query_microbatch=microbatch,total_waves=len(waves),
         full_v_bytes_per_layer=v_bytes,
-        per_token_v_read_bytes=v_bytes*w.batch,
+        per_token_v_read_bytes=sum(wv.fetched_v_bytes for wv in waves),
         prefix_score_link_bytes_avoided=score_link_bytes,
         context_and_lse_link_bytes=context_bytes,
         source_gpu_prefix_qk_s=gpu_prefix_qk_s,
