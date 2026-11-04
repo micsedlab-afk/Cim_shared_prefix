@@ -290,6 +290,40 @@ def run(out: Path):
         "digital_isoarea_qualified_coordinates": 0,
         "conditional_excluded_coordinates": sum(r["conditional_excluded_at_2ms_deadline"] for r in all_rows),
         "conditional_serial_achievable_coordinates": sum(r["serial_achievable_at_2ms_deadline"] for r in all_rows),
+        "illustrative_conditional_points": [
+            {
+                "model": row["model"],
+                "budget_mm2": row["budget_mm2"],
+                "support_mm2_sensitivity": row["support_mm2_sensitivity"],
+                "prefix_tokens": row["prefix_tokens_original"],
+                "batch": row["batch"],
+                "output_tokens": row["output_tokens"],
+                "bandwidth_Bps_sensitivity": row["source_bandwidth_Bps_sensitivity"],
+                "macro_count": row["physical_macros_first"],
+                "pinned_layers": row["pinned_layers_first"],
+                "scratch_tile_units": row["scratch_tile_units_first"],
+                "resource_floor_ms": row["optimistic_resource_lower_bound_s"]*1e3,
+                "conditional_serial_ms": row["serial_completed_prefix_scores_s"]*1e3,
+                "minimum_common_interface_TBps_for_2ms": (
+                    row["minimum_common_byte_bandwidth_Bps_for_2ms_serial"]/1e12
+                    if row["minimum_common_byte_bandwidth_Bps_for_2ms_serial"] is not None
+                    else None
+                ),
+                "stage_ms": {
+                    name.removeprefix("stage_").removesuffix("_s"): value*1e3
+                    for name, value in row.items()
+                    if name.startswith("stage_") and name.endswith("_s")
+                },
+            }
+            for row in all_rows
+            if row["prefix_tokens_original"] == (
+                512 if row["model"].startswith("facebook/opt") else 2048
+            )
+            and row["batch"] == 1 and row["output_tokens"] == 128
+            and row["source_bandwidth_Bps_sensitivity"] == 1e12
+            and row["support_mm2_sensitivity"] == 0.5
+            and row["budget_mm2"] in (1, 4, 8, 16)
+        ],
         "end_to_end_decoder_status": "unqualified: Hydragen-style GPU full attention and remaining operators missing",
         "SWA": "Mistral each position uses causally visible prefix; changing window uses cold per-token constructive schedules; necessary bound omits recurring programming",
         "opt_limit": "prefix+suffix+generated tokens <= 2048",
