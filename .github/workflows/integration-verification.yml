@@ -38,7 +38,14 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "results: regenerate qualified conditional physical envelope"
-            git push origin HEAD:integration/final-framework
+            for attempt in 1 2 3; do
+              if git push origin HEAD:integration/final-framework; then
+                echo "Published generated figures and CSV at $(git rev-parse HEAD)"
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then exit 1; fi
+              sleep 5
+            done
           fi
       - uses: actions/upload-artifact@v4
         if: always()
