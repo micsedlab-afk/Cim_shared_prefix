@@ -1,0 +1,93 @@
+{
+  "schema": "cim-shared-prefix-native-grouped-A100-FP16-roofline/v1",
+  "source_repo": "micsedlab-afk/MAGMA-gpt",
+  "source_branch": "research/cim-native-gqa-20261104",
+  "source_commit": "9d1e34f36737a87dc16995931603ef04acb44454",
+  "run_url": "https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41855617524",
+  "method": "vendored software_model.matmul.Matmul.roofline_model for each KV head, M=B*G=4B, K=128, N=2048; K shared across batch, multiply eight native KV heads",
+  "device": "LLMCompass A100 80GB FP16 HBM2e model; no GPU hardware",
+  "model": "Llama-3.1-8B GQA",
+  "prefix": 2048,
+  "results": [
+    {
+      "KV_heads": 8,
+      "batch": 1,
+      "head_dim": 128,
+      "native_compute_flops": 16777216,
+      "native_operand_and_score_bytes": 2166784,
+      "prefix": 2048,
+      "queries_per_KV_head": 4,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 1.3283374203040705e-7,
+      "total_source_grouped_QK_s": 0.0000010626699362432564
+    },
+    {
+      "KV_heads": 8,
+      "batch": 2,
+      "head_dim": 128,
+      "native_compute_flops": 33554432,
+      "native_operand_and_score_bytes": 2236416,
+      "prefix": 2048,
+      "queries_per_KV_head": 8,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 1.3710250122609122e-7,
+      "total_source_grouped_QK_s": 0.0000010968200098087298
+    },
+    {
+      "KV_heads": 8,
+      "batch": 4,
+      "head_dim": 128,
+      "native_compute_flops": 67108864,
+      "native_operand_and_score_bytes": 2375680,
+      "prefix": 2048,
+      "queries_per_KV_head": 16,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 1.4564001961745953e-7,
+      "total_source_grouped_QK_s": 0.0000011651201569396763
+    },
+    {
+      "KV_heads": 8,
+      "batch": 8,
+      "head_dim": 128,
+      "native_compute_flops": 134217728,
+      "native_operand_and_score_bytes": 2654208,
+      "prefix": 2048,
+      "queries_per_KV_head": 32,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 1.6271505640019618e-7,
+      "total_source_grouped_QK_s": 0.0000013017204512015694
+    },
+    {
+      "KV_heads": 8,
+      "batch": 16,
+      "head_dim": 128,
+      "native_compute_flops": 268435456,
+      "native_operand_and_score_bytes": 3211264,
+      "prefix": 2048,
+      "queries_per_KV_head": 64,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 1.9686512996566944e-7,
+      "total_source_grouped_QK_s": 0.0000015749210397253555
+    },
+    {
+      "KV_heads": 8,
+      "batch": 32,
+      "head_dim": 128,
+      "native_compute_flops": 536870912,
+      "native_operand_and_score_bytes": 4325376,
+      "prefix": 2048,
+      "queries_per_KV_head": 128,
+      "source_device": "LLMCompass A100_80GB_fp16; data_type fp16; HBM2e",
+      "source_single_group_roofline_s": 2.6516527709661597e-7,
+      "total_source_grouped_QK_s": 0.0000021213222167729278
+    }
+  ],
+  "not_claimed": [
+    "measured A100",
+    "native optimized Hydragen kernel",
+    "BF16",
+    "complete attention or decoder",
+    "score-free fused kernel"
+  ],
+  "importance": "source-grounded shared-K source GPU baseline; test all selective CIM candidates against this stronger query-batched reference"
+}

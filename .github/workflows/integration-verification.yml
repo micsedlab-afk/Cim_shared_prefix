@@ -1,7 +1,7 @@
 name: GPU evidence and integrated regression
 on:
   push:
-    branches: [integration/final-framework]
+    branches: [integration/final-framework, research/selective-pipelined-offload-20261104]
     paths-ignore:
       - 'results/integration/**'
       - 'results/gpu/**'
@@ -110,3 +110,56 @@ jobs:
           name: paired-source-native-a100-gqa-fp16-vs-7nm-cim
           path: /tmp/paired-a100-fp16-vs-7nm-cim-model.json
           if-no-files-found: ignore
+
+      - name: Execute finite-buffer selective pinned-layer optimization
+        run: |
+          python scripts/run_selective_pipelined_study.py \
+            --csv /tmp/selective-pipeline-conditions.csv \
+            --summary /tmp/selective-pipeline-reference.json
+          python - <<'PY'
+          import csv,json,math
+          with open('/tmp/selective-pipeline-conditions.csv') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==4*4*3*5*3
+          summary=json.load(open('/tmp/selective-pipeline-reference.json'))
+          r=summary['reference']
+          assert r['policy_selected_layers']==1
+          assert r['pipeline']['physical_storage_macros']==10
+          assert math.isclose(r['candidate_minus_gpu_s_per_token']*1e6,
+                              -.2440211083864641,rel_tol=1e-8)
+          assert r['minimum_outputs_to_amortize_cold']==16
+          assert all(r['hardware_speedup']=='' for r in rows)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conditional-selective-pipelined-7nm-policy
+          path: |
+            /tmp/selective-pipeline-conditions.csv
+            /tmp/selective-pipeline-reference.json
+          if-no-files-found: error
+
+
+      - name: Compare against grouped shared-prefix GPU native source model
+        run: |
+          python scripts/compare_grouped_gpu_7nm_selective.py \
+            --csv /tmp/grouped-gpu-vs-selective-cim.csv \
+            --json /tmp/grouped-gpu-vs-selective-cim.json
+          python - <<'PY'
+          import csv,json,math
+          r=json.load(open('/tmp/grouped-gpu-vs-selective-cim.json'))
+          assert len(r['rows'])==6
+          assert [x['batch'] for x in r['rows']]==[1,2,4,8,16,32]
+          assert r['rows'][0]['status']=='CONDITIONAL_QK_WIN'
+          assert r['rows'][0]['modeled_hybrid_minus_GPU_us_per_token']<0
+          for row in r['rows']:
+              assert row['buffer_area_mm2']<=.1+1e-12
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grouped-native-shared-prefix-GPU-vs-7nm-selective
+          path: |
+            /tmp/grouped-gpu-vs-selective-cim.csv
+            /tmp/grouped-gpu-vs-selective-cim.json
+          if-no-files-found: error
