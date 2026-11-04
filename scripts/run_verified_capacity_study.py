@@ -18,14 +18,14 @@ from cim_shared_prefix.verified_residency_limits import (
     capacity_limit, dense_llama_weight_parameters,
     fp16_decoder_weight_bytes, A100_80GB_SXM_HBM_BPS,
     A100_L2_NOMINAL_BYTES, A100_PUBLIC_DOC, A100_SOURCE,
-    LLAMA_CONFIG_SOURCE,
+    LLAMA_CONFIG_SOURCE, fused_gpu_floor_and_requirements,
 )
 
 PREF=(16,32,64,80,128,256,304,320,384,512,768,1024,1536,2048,2304,3072,4096)
 BUDGETS=(1,2,4,8,16,32,64,128)
 
 
-def execute(csv_path:Path,summary_path:Path,
+def execute(csv_path:Path,summary_path:Path,rate_csv_path:Path,
             prefixes=PREF,area_budgets=BUDGETS):
     rows=[capacity_limit(p,area).json_record() for area in area_budgets for p in prefixes]
     if not rows:
@@ -35,6 +35,13 @@ def execute(csv_path:Path,summary_path:Path,
         writer=csv.DictWriter(f,fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+    rates=[fused_gpu_floor_and_requirements(p,1,16,placement).json_record()
+           for p in prefixes for placement in ("HBM","L2")]
+    rate_csv_path.parent.mkdir(parents=True,exist_ok=True)
+    with rate_csv_path.open("w",newline="") as fd:
+        wr=csv.DictWriter(fd,fieldnames=list(rates[0]))
+        wr.writeheader()
+        wr.writerows(rates)
     main=capacity_limit(2048,16)
     multi=capacity_limit(4096,16)
     short=capacity_limit(64,16)
@@ -63,12 +70,15 @@ def execute(csv_path:Path,summary_path:Path,
             "not_a_full_decoder_latency_measurement":True
         },
         "main_16mm2_P2048":main.json_record(),
+        "source_ideal_fused_GPU_HBM_P2048_B1":fused_gpu_floor_and_requirements(2048,1,16,"HBM").json_record(),
+        "source_ideal_fused_GPU_L2_P2048_B1":fused_gpu_floor_and_requirements(2048,1,16,"L2").json_record(),
         "full_KV_P4096_16mm2":multi.json_record(),
         "entire_model_KV_cache_B1_P64":short.json_record(),
         "A100_L2_pressure_boundary_P320":head.json_record(),
         "area_budgets_mm2":list(area_budgets),
         "prefixes":list(prefixes),
         "case_count":len(rows),
+        "ideal_fused_GPU_rate_boundary_cases":len(rates),
         "bound_scope":[
             "fixed 7nm complete signed K4 CIM and complete 7nm FP16 V SRAM macros only",
             "16mm2 is the explicitly studied accelerator storage budget, not measured die size",
@@ -91,9 +101,11 @@ def execute(csv_path:Path,summary_path:Path,
         "max_partially_persistent_tiles":main.max_persistent_16token_layer_tiles_without_peripherals,
         "max_persistent_prefix_fraction":main.persistent_prefix_token_layer_fraction_ceiling,
         "max_GPU_streaming_HBM_byte_fraction_saved":main.optimistic_fraction_of_full_decoder_HBM_bytes_removed,
+        "ideal_fused_GPU_HBM_attention_us_per_layer":fused_gpu_floor_and_requirements(2048,1,16,"HBM").ideal_fused_GPU_prefix_floor_s*1e6,
+        "ideal_fused_GPU_L2_attention_us_per_layer":fused_gpu_floor_and_requirements(2048,1,16,"L2").ideal_fused_GPU_prefix_floor_s*1e6,
         "P4096_full_KV_layers":multi.max_complete_layers_without_peripherals,
         "P64_full_KV_layers":short.max_complete_layers_without_peripherals,
-        "csv":str(csv_path),"summary":str(summary_path)
+        "csv":str(csv_path),"rate_csv":str(rate_csv_path),"summary":str(summary_path)
     },sort_keys=True))
 
 
@@ -101,5 +113,6 @@ if __name__=="__main__":
     ap=argparse.ArgumentParser()
     ap.add_argument("--csv",type=Path,required=True)
     ap.add_argument("--summary",type=Path,required=True)
+    ap.add_argument("--rate-csv",type=Path,required=True)
     args=ap.parse_args()
-    execute(args.csv,args.summary)
+    execute(args.csv,args.summary,args.rate_csv)
