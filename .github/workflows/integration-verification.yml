@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p results/integration
           cp -a /tmp/integrated-architecture/. results/integration/
-          git add results/integration
+          git add -f results/integration
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
