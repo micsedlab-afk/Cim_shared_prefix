@@ -67,7 +67,10 @@ class SelectivePipelineTests(unittest.TestCase):
         self.assertIsNone(result.json_record().get("full_decoder_TPOT_s"))
 
     def test_finite_two_wave_buffer_required_and_no_unfunded_staging(self):
-        self.assertIsNone(self.make_pipeline(stage_area=.08))
+        self.assertIsNone(self.make_pipeline(stage_area=.005))
+        reduced=self.make_pipeline(stage_area=.08)
+        self.assertIsNotNone(reduced)
+        self.assertLess(reduced.groups_per_wave,64)
         self.assertIsNotNone(self.make_pipeline(stage_area=.1))
         self.assertIsNone(self.make_pipeline(budget=13))
         self.assertIsNotNone(self.make_pipeline(budget=14))
