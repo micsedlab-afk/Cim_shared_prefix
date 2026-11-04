@@ -65,7 +65,6 @@ class NearMemoryPrefixContextTests(unittest.TestCase):
         self.assertGreater(short.mean_context_s,fast.mean_context_s)
         self.assertIsNone(self.pipe(area_mm2=14))
         self.assertIsNotNone(self.pipe(area_mm2=15))
-        self.assertIsNone(self.pipe(v_bits=4) if False else None)
 
     def test_zero_adc_or_device_claim_never_inferred(self):
         with self.assertRaisesRegex(ValueError,"V remains FP16"):
