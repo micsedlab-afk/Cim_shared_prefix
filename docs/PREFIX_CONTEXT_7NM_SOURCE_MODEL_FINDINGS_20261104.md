@@ -1,6 +1,6 @@
 # Executed prefix-context study — 7-nm CIM QK + FP16 V SRAM + digital online attention
 
-**Date:** 4 November 2026. **Current evidence:** a locally executed independent Python replication, published macro specifications, original MAGMA/LLMCompass source. The corresponding exact repository module/CI jobs are **queued**, and neither a measured GPU nor a fabricated integrated accelerator has been tested.
+**Date:** 4 November 2026. **Current evidence:** a locally executed independent Python replication, published macro specifications, original MAGMA/LLMCompass source. The corresponding exact repository module/CI jobs have **passed**, and neither a measured GPU nor a fabricated integrated accelerator has been tested.
 
 ## 1. Architecture and numerical semantics
 
@@ -82,6 +82,6 @@ Independent local execution generated downloadable `prefix_context_independent_s
 `prefix_context_corrected_gpu_comparison.csv`,
 `prefix_context_required_rate_frontier.csv`, and `prefix_context_rate_frontier.svg`. The committed feature branch records the independently executed reference in `results/integration/prefix_context_independent_local_20261104.json`.
 
-**Important:** GitHub Actions for the new feature branch and the updated native MAGMA comparators are presently queued; do not represent the new source modules as CI-qualified. Do not merge into the integration branch before the full test/sweep workflow completes successfully. The original integration branch remains independently qualified to its prior limits.
+**Final qualification:** [Source-model integration CI 41868345731](https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/41868345731) completed with 156 discovered tests (155 pass, 1 optional skip), 576-case sweep and archived output artifacts. [Native MAGMA model CI 41868354178](https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41868354178) passed and executed source QK–softmax–PV with corrected FP16 bytes. These checks validate **the executed simulation implementation** and its provenance, not silicon/digital area or optimized fused Hydragen performance. See `docs/FINAL_RESULTS_AND_REVIEWER_MATRIX_20261104.md` for the reviewer-ordered final evidence and conclusions.
 
 **Scientific decision:** the full-prefix attention endpoint materially reduces communication and avoids introducing new V approximation, but the modeled benefit is sensitive to highly aggressive unqualified local SRAM and digital PV throughput. The source-model byte correction makes GPU memory placement the deciding axis. A robust 7-nm silicon implementation win is **not** established by these results. The constructive next architectural direction is reducing the requirement for V SRAM bandwidth/digital MAC throughput or co-designing a fuller KV-resident attention engine with documented physical rates; inflated GPU rooflines or unsupported periphery rates are not acceptable alternatives.
