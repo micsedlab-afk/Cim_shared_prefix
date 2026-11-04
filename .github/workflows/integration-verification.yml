@@ -24,6 +24,7 @@ jobs:
           PYTHONPATH=src python scripts/run_source_sweep.py /tmp/source-grounded
           PYTHONPATH=src python scripts/run_residency_sweep.py /tmp/physical-residency
           python scripts/export_quality_workloads.py --out /tmp/quality-geometry --profile-only
+          PYTHONPATH=src python scripts/run_integrated_architecture.py /tmp/integrated-architecture
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -32,4 +33,5 @@ jobs:
             /tmp/source-grounded
             /tmp/physical-residency
             /tmp/quality-geometry
+            /tmp/integrated-architecture
           if-no-files-found: ignore
