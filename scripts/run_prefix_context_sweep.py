@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from cim_shared_prefix.contracts import Workload
 from cim_shared_prefix.prefix_context_engine import ContextRates,simulate_prefix_context
+from cim_shared_prefix.source_roofline_corrected import from_native_grouped_row
 
 GROUPED=Path("results/integration/native_grouped_a100_fp16_prefix_roofline.json")
 FULL=Path("results/integration/native_full_prefix_a100_fp16_roofline.json")
@@ -29,21 +30,16 @@ def run(args):
     gpu=json.loads(args.gpu.read_text())
     if gpu.get("schema")!="cim-shared-prefix-native-grouped-A100-FP16-roofline/v1":
         raise ValueError("unrecognized source GPU grouped QK model")
-    grouped={d["batch"]:d["total_source_grouped_QK_s"] for d in gpu["results"]}
-    if args.full.exists():
-        full=json.loads(args.full.read_text())
-        if full.get("schema")!="native-llmcompass-unfused-shared-prefix-attention-FP16/v1":
-            raise ValueError("unrecognized full-prefix source model")
-        full_by_batch={x["batch"]:x for x in full["results"]}
-        if set(grouped)!=set(full_by_batch):
-            raise ValueError("native GPU comparator batch geometry differs")
-    else:
-        full_by_batch={}
+    # Reconstruct physical FP16 bytes from the unchanged source Matmul
+    # operator geometry. The legacy source Matmul.io_count field stores
+    # ELEMENTS yet its original roofline divides by bandwidth in B/s.
+    native={d["batch"]:from_native_grouped_row(d) for d in gpu["results"]}
     rows=[]
     examples={}
     for B in args.batches:
-        if B not in grouped:
+        if B not in native:
             raise ValueError("missing source GPU QK batch")
+        gpu_source=native[B]
         for area in args.areas:
             for port in args.ports:
                 for vbw in args.v_bw_TBps:
@@ -68,16 +64,21 @@ def run(args):
                             p=simulate_prefix_context(
                                 w,area_mm2=area,
                                 support_mm2=args.support_mm2,ports=port,
-                                rates=rates,gpu_prefix_qk_s=grouped[B],
+                                rates=rates,gpu_prefix_qk_s=gpu_source.corrected_hbm_qk_s,
                                 external_setup_s_per_token=args.setup_us*1e-6)
-                            gpu_full=full_by_batch.get(B,{}).get("full_prefix_unfused_operator_sum_s")
+                            gpu_full=gpu_source.hbm_unfused_full_prefix_s
+                            gpu_full_L2=gpu_source.l2_unfused_full_prefix_s
                             base=dict(B=B,P=2048,O=O,area_mm2=area,
                                       support_mm2=args.support_mm2,port_cap=port,
                                       V_local_TBps=vbw,PV_digital_TMAC_per_s=mac,
                                       exp_digital_Texp_per_s=args.exp_Tper_s,
                                       external_link_TBps=args.external_TBps,
                                       external_setup_us_per_token=args.setup_us,
-                                      grouped_GPU_QK_source_us=grouped[B]*1e6,
+                                      grouped_GPU_QK_source_us=gpu_source.corrected_hbm_qk_s*1e6,
+                                      legacy_element_count_GPU_QK_us=gpu_source.native_legacy_matmul_qk_s*1e6,
+                                      corrected_HBM_GPU_QK_us=gpu_source.corrected_hbm_qk_s*1e6,
+                                      corrected_L2_GPU_QK_us=gpu_source.corrected_l2_qk_s*1e6,
+                                      corrected_L2_GPU_unfused_full_us=gpu_full_L2*1e6,
                                       unfused_GPU_full_prefix_source_us=(
                                           gpu_full*1e6 if gpu_full else None),
                                       hardware_speedup=None,
@@ -90,7 +91,9 @@ def run(args):
                                             wave_groups=None,query_microbatch=None,model_extra_setup_margin_us=None,
                                             required_PV_MAC_density_TMAC_per_s_mm2=None)
                             else:
-                                delta_qk=(p.mean_context_s-grouped[B])*1e6
+                                delta_qk=(p.mean_context_s-gpu_source.corrected_hbm_qk_s)*1e6
+                                delta_l2_qk=(p.mean_context_s-gpu_source.corrected_l2_qk_s)*1e6
+                                delta_l2_full=(p.mean_context_s-gpu_full_L2)*1e6
                                 delta_full=((p.mean_context_s-gpu_full)*1e6
                                             if gpu_full is not None else None)
                                 base.update(status="MODEL_BELOW_GPU_QK_PROXY" if delta_qk<0 else
@@ -101,6 +104,9 @@ def run(args):
                                             warm_context_us=p.warm_attention_context_s*1e6,
                                             cold_KV_us_once=p.cold_KV_supply_and_program_s*1e6,
                                             model_vs_GPU_QK_us=delta_qk,
+                                            model_vs_HBM_GPU_QK_us=delta_qk,
+                                            model_vs_L2_GPU_QK_us=delta_l2_qk,
+                                            model_vs_L2_unfused_full_us=delta_l2_full,
                                             model_vs_unfused_GPU_us=delta_full,
                                             physical_area_used_mm2=p.total_physical_area_mm2,
                                             K_CIM_macros=p.cim_k_macros,
@@ -108,7 +114,7 @@ def run(args):
                                             buffer_SRAM_macros=p.sram_pipeline_macros,
                                             V_read_bytes_per_token=p.per_token_v_read_bytes,
                                             wave_groups=p.wave_groups,query_microbatch=p.query_microbatch,
-                                            model_extra_setup_margin_us=(grouped[B] -
+                                            model_extra_setup_margin_us=(gpu_source.corrected_hbm_qk_s -
                                                 p.mean_context_s+args.setup_us*1e-6)*1e6,
                                             required_PV_MAC_density_TMAC_per_s_mm2=(
                                                 p.digital_MAC_rate_density_required_per_mm2/1e12))
@@ -127,8 +133,9 @@ def run(args):
     for row in rows:status[row["status"]]=status.get(row["status"],0)+1
     result={
         "schema":"conditional-7nm-K-CIM-FP16V-prefix-context-sweep/v1",
-        "source_GPU_QK":"native LLMCompass A100 FP16 grouped K-shared source roofline",
-        "source_GPU_full":"native LLMCompass A100 FP16 unfused QK+softmax+PV roofline, if present",
+        "source_GPU_QK":"byte-corrected LLMCompass A100 FP16 grouped QK source roofline: HBM and L2 cases separate",
+        "matmul_source_units":"original Matmul.io_count elements; converted to two bytes/FP16 element before division by B/s",
+        "source_GPU_full":"source-algebra-derived A100 FP16 unfused QK+softmax+PV roofline under HBM/L2; GPU kernel fusion not modeled",
         "architecture":"one complete pinned 7nm Q4K4O4 K-CIM layer + FP16 V SRAM + digital stable online softmax and PV",
         "conditional_inputs":{
             "external_support_mm2":args.support_mm2,
@@ -144,6 +151,8 @@ def run(args):
         "model_comparison_scope":[
             "QK-only source GPU roofline is a proxy threshold, not an observed lower bound on optimized fused GPU attention",
             "unfused QK+softmax+PV roofline is a complete prefix endpoint but an unoptimized serial GPU model",
+            "original grouped Matmul source undercounted FP16 memory bytes by 2x; original result preserved as historical source", 
+            "L2 placement assumes operand residency and represents a strong alternate GPU reference",
             "near-memory PV is digital with explicit throughput, area and power unqualified",
             "FP16 V is preserved, signed Q4K4O4 scores approximate BF16 GPU score values",
             "prefix context plus LSE passed to GPU for its suffix fusion; common suffix not profiled",
