@@ -191,6 +191,10 @@ def simulate_prefix_context(
     score_link_bytes=scores*4
     context_bytes=w.batch*w.query_heads*(w.head_dim*2+4)
     output_s=context_bytes/rates.context_output_Bps
+    # One final division per FP32 context coordinate and a log per query head
+    # are required to emit normalized FP16 context and its FP32 LSE.
+    finalize_s=(w.batch*w.query_heads*w.head_dim / rates.scalar_ops_per_s +
+                w.batch*w.query_heads / rates.exp_per_s)
     # Streaming online softmax must retain FP32 m,l,o for every query.
     state_bytes=w.batch*w.query_heads*(w.head_dim+2)*4
     options=[]
@@ -240,7 +244,7 @@ def simulate_prefix_context(
             total_area=fixed_area+buffer_area
             if total_area>area_mm2+1e-12:
                 continue
-            warm=input_s+_blocking_pipeline(waves)+output_s+rates.controller_s_per_layer+external_setup_s_per_token
+            warm=(input_s+_blocking_pipeline(waves)+finalize_s+output_s+\n                  rates.controller_s_per_layer+external_setup_s_per_token)
             # First token programs complete physical images of all K± and
             # FP16 V SRAM macros. No preloading is silently free.
             k_bytes=k_macros*(CIM_7NM.capacity_bits//8)
