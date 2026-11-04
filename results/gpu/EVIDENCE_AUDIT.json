@@ -1,0 +1,173 @@
+{
+  "schema": "cim-shared-prefix-gpu-evidence-audit/v1",
+  "date_utc": "2026-11-04",
+  "repository": "micsedlab-afk/Cim_shared_prefix",
+  "branch": "integration/final-framework",
+  "qualification_status": "BLOCKED_NO_ACCESSIBLE_CUDA_EXECUTION_OR_MATCHED_TPOT",
+  "execution_environment": {
+    "machine": "current ChatGPT container",
+    "torch": "2.10.0+cpu",
+    "torch_cuda": null,
+    "cuda_available": false,
+    "nvidia_smi_present": false,
+    "github_actions_CPU_runner": "CPU-only PyTorch installed",
+    "direct_UNISA_SSH_or_Slurm_access": false
+  },
+  "remote_resources": [
+    {
+      "identifier": "UNISA H100, aiq partition, GPU compute ainode01/ainode02",
+      "gpu": "H100",
+      "source": "earlier workstation/UNISA acquisitions and HBM4PiM research branch",
+      "access": "HISTORICAL_PATHS_ONLY; NO CURRENT REMOTE_SHELL",
+      "paths": [
+        "~/H100calib/acquisition_20261026",
+        "~/H100calib/comprehensive_v2_20261026",
+        "~/HBM4PiM"
+      ],
+      "claim": "Existing H100 model and profiler acquisition source/scripts are accessible through GitHub; raw on-host measurements not mounted in this environment"
+    },
+    {
+      "identifier": "MAGMA-gpt source LLMCompass",
+      "source": "micsedlab-afk/MAGMA-gpt (connected GitHub)",
+      "access": "SOURCE_READ_ONLY; native model can be executed only where its vendored local dependencies are present",
+      "source_adapters": [
+        "scripts/run_gqa_llmcompass.py",
+        "scripts/run_hbm4pim_gqa_local.py"
+      ],
+      "limitations": "Existing LLMCompass native A100 FP16 GQA-operator adapter lacks RMSNorm, SwiGLU, RoPE and full optimized Hydragen/suffix GPU kernel; H100 BF16 exact decoder timing not established"
+    }
+  ],
+  "existing_source_evidence": {
+    "source_repository": "micsedlab-afk/HBM4PiM",
+    "source_branch": "research/h100-mistral-acquisition-20261026",
+    "file": "calibration/native/H100_MEASURED_REFERENCES_465.csv",
+    "github_blob_sha": "384c06a2f689f6294686fe15b764d1f3cab809a3",
+    "records_count": 465,
+    "exact_shape_probes": [
+      {
+        "shape": [
+          1,
+          4096,
+          4096
+        ],
+        "GPU_records": 0
+      },
+      {
+        "shape": [
+          1,
+          4096,
+          1024
+        ],
+        "GPU_records": 0
+      },
+      {
+        "shape": [
+          1,
+          4096,
+          14336
+        ],
+        "GPU_records": 2,
+        "record_details": [
+          {
+            "precision": "BF16",
+            "Graph_reference_s": 0.00003944025,
+            "backend": "cublasGemmEx_default",
+            "evidence": "PASS_REUSED_FROZEN",
+            "spread": "UNAVAILABLE_NOT_ZERO"
+          },
+          {
+            "precision": "FP16",
+            "Graph_reference_s": 0.000039699250999999994,
+            "backend": "cublasGemmEx_default",
+            "evidence": "PASS_REUSED_FROZEN",
+            "spread": "UNAVAILABLE_NOT_ZERO"
+          }
+        ]
+      },
+      {
+        "shape": [
+          1,
+          14336,
+          4096
+        ],
+        "GPU_records": 0
+      },
+      {
+        "shape": [
+          1,
+          4096,
+          128256
+        ],
+        "GPU_records": 0
+      },
+      {
+        "shape": [
+          4,
+          128,
+          2048
+        ],
+        "GPU_records": 0
+      }
+    ],
+    "qualification": "Two shape-compatible isolated real H100 GEMM measurements only. Not full-attention, full decoder, per-model quality or functional shared-prefix benchmark"
+  },
+  "model_compatibility": {
+    "reference_llama": {
+      "model_id": "meta-llama/Llama-3.1-8B",
+      "source_revision": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b",
+      "heads": 32,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "layers": 32,
+      "precision": "BF16",
+      "prefix": 2048,
+      "suffix": 128,
+      "batch": 1,
+      "output_steps": 128,
+      "real_gpu_hydragen_attention_measurements": 0,
+      "real_pretrained_decoder_measurements": 0
+    },
+    "mistral": {
+      "model_id": "mistralai/Mistral-7B-v0.1",
+      "source_profile_revision": "17688039ea7b7001c702797eed2ab7716a0cc3c2",
+      "archived_H100_acquisition_revision": "27d67f1b5f57dc0953326b2601d68371d40ea8da",
+      "revision_compatible_for_reuse": false,
+      "archived_H100_precision": "FP16",
+      "quality_protocol_precision": "BF16",
+      "SWA_visible_window": 4096,
+      "note": "On-host H100 acquisitions cannot be retagged to BF16 or to a distinct pinned checkpoint. Their serving prompt lengths do not include the 2048+128 reference geometry"
+    },
+    "opt": {
+      "model_id": "facebook/opt-2.7b",
+      "revision": "905a4b602cda5c501f1b3a2650a4152680238254",
+      "heads": 32,
+      "kv_heads": 32,
+      "head_dim": 80,
+      "native_source_precision": "FP16",
+      "quality_evaluation_variant": "BF16 explicit model copy, not source FP16",
+      "max_position_embeddings": 2048
+    }
+  },
+  "quality": {
+    "llama_archived_evaluated_units": 96,
+    "opt_evaluated_units": 0,
+    "mistral_evaluated_units": 0,
+    "source": "results/quality/source_evidence.json and results/quality/extended_status.json"
+  },
+  "missing_publication_gates": [
+    "Direct CUDA runtime on UNISA/workstation/H100, raw archived model/cache, or an allowed attached GPU runner",
+    "Kernel benchmark for each of 128 decode steps, exact model geometry/dtype, Flash and shared-prefix candidate, source CUDA events and kernel proof",
+    "Matched pretrained Llama GQA BF16 decoder hooks and profile plus corresponding Mistral/OPT on their own revisions",
+    "Qualified SRAM source K/key links, CIM programming/output bandwidth, reduction and external support area",
+    "OPT/Mistral R0-R3 inference + development-only ADC calibration on matching BF16-capable CUDA device"
+  ],
+  "measurements_generated_this_session": {
+    "real_CUDA_kernel_measurements": 0,
+    "pretrained_full_model_GPU_measurements": 0,
+    "quality_model_evaluations": 0,
+    "TPOT_s": null,
+    "full_decoder_speedup": null,
+    "competitive_GPU_CIM_region": null
+  },
+  "publication_conclusion": "No positive competitive region is established; exclusion relative to optimized GPU cannot be recalculated until exact measured GPU attention at same functional endpoint. Historical 2ms regions are deadline sensitivities only."
+}

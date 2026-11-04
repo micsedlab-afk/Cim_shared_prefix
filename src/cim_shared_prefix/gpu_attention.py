@@ -11,6 +11,7 @@ improve execution only if supported and measured on an actual CUDA device.
 """
 from __future__ import annotations
 from math import sqrt
+from functools import lru_cache
 
 import torch
 from torch.nn import functional as F
@@ -105,6 +106,7 @@ def shared_prefix_gemm_attention(q, pk, pv, sk, sv):
     return mixed.reshape(b, hq, 1, d).to(q.dtype)
 
 
+@lru_cache(maxsize=2)
 def make_candidate(name: str):
     if name == "grouped_gemm":
         return shared_prefix_gemm_attention
@@ -112,8 +114,8 @@ def make_candidate(name: str):
         if not hasattr(torch, "compile"):
             raise RuntimeError("torch.compile unavailable")
         # Tensor geometry is static at one benchmarked decode position.
-        return torch.compile(shared_prefix_gemm_attention, mode="reduce-overhead",
-                             fullgraph=True)
+        return torch.compile(shared_prefix_gemm_attention, mode="default",
+                             fullgraph=True, dynamic=True)
     raise ValueError("unknown candidate")
 
 

@@ -229,9 +229,11 @@ def acquire(a):
                 start.record()
                 out=model(input_ids=next_ids, past_key_values=out.past_key_values,
                           use_cache=True, return_dict=True)
+                # Sample next token INSIDE the CUDA-event span, along with
+                # all decoder layers, KV updates and final LM head.
+                next_ids=out.logits[:, -1, :].argmax(dim=-1, keepdim=True)
                 stop.record()
                 starts.append(start); ends.append(stop)
-                next_ids=out.logits[:, -1, :].argmax(dim=-1, keepdim=True)
             torch.cuda.synchronize()
         ms=[float(st.elapsed_time(en)) for st,en in zip(starts,ends)]
         if len(ms)!=a.output_tokens or any(not math.isfinite(x) or x<=0 for x in ms):
@@ -262,6 +264,7 @@ def acquire(a):
         "mean_post_prefill_gpu_tpot_s":statistics.median(x["gpu_decode_total_ms"] for x in rounds)/(a.output_tokens*1000.0),
         "instrumented_operator_probe":probe,
         "attention_reference": "unoptimized native full-cache HF SDPA; NOT optimized Hydragen",
+        "flash_attention_kernel_verified": (probe or {}).get("flash_kernel_observed") if probe is not None else None,
         "GPU_SRAM_CIM_tpot_or_speedup":None,
         "precision_qualification": "actual weights and exact dtype; alternative model revision separately tagged",
     }
