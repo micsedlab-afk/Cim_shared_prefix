@@ -1,0 +1,18 @@
+{
+  "backend": "original unmodified sinangil_ideal_macro.run_ideal_macro and sinangil_mappings.execute_mapping",
+  "checked_work": "Q4K4 positive/negative sign components, two 64-row tiles, sixteen score outputs",
+  "classification": "upstream_ideal_digital_arithmetic_reference_only",
+  "hardware_timing_executed": false,
+  "mapping_samples": 128,
+  "max_integer_dot_error": 0,
+  "native_macro_calls": 96,
+  "physical_macros_simulated": false,
+  "samples": 192,
+  "schema": "cim-shared-prefix-upstream-execution/v1",
+  "signed_mapping_blob_git_sha1": "78c30ae3996f1cd830d2a6d08ebb1685cedbe645",
+  "source_commit": "a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4",
+  "source_file_blob_git_sha1": "6e968ef3b4cd2b09529930ad24cce66425ff93e0",
+  "source_mapping_macro_calls": 64,
+  "source_repo": "micsedlab-afk/shared_prefix_cim",
+  "source_verified": true
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "cim-shared-prefix-matched-system-request/v1",
+  "workload": {
+    "batch": 1,
+    "prefix_tokens": 2048,
+    "suffix_tokens": 128,
+    "query_heads": 32,
+    "kv_heads": 8,
+    "head_dim": 128,
+    "layers": 32,
+    "output_tokens": 32,
+    "key_bits": 4
+  },
+  "cim_physical": {
+    "macro_budget": 4096,
+    "active_macro_ports": 256,
+    "q_bits": 4,
+    "source": "explicit sensitivity macro budget"
+  },
+  "sram_macro_budget": 64
+}
