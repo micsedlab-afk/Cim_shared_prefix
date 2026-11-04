@@ -1,0 +1,121 @@
+{
+  "schema": "cim-7nm-prefix-context-local-independent-study-20261104/v1",
+  "status": "INDEPENDENT_72_CASES_EXECUTED__SOURCE_576_CASES_CI_SUCCESS",
+  "scientific_scope": "published 7nm Sinangil signed Q4K4 positive_negative_split + separately published 7nm Yokoyama FP16 V SRAM + assumed digital online softmax/PV",
+  "model": "Llama-3.1-8B GQA, B1, P2048, suffix128, O128, 32 heads/8 KV/128 d, one resident layer",
+  "provenance": {
+    "source_branch": "research/prefix-context-offload-20261104",
+    "repo": "micsedlab-afk/Cim_shared_prefix",
+    "models": [
+      "src/cim_shared_prefix/prefix_context_engine.py",
+      "src/cim_shared_prefix/source_roofline_corrected.py"
+    ],
+    "independent_local_simulation": "/mnt/data/prefix_context_independent.py",
+    "independent_GPU_source_correction": "/mnt/data/source_gpu_byte_corrected.py",
+    "native_GPU_reference": "results/integration/native_grouped_a100_fp16_prefix_roofline.json",
+    "independent_local_data": "prefix_context_corrected_gpu_comparison.csv",
+    "GPU_hardware_measured": false,
+    "CIM_system_physically_qualified": false,
+    "full_TPOT_qualified": false
+  },
+  "technology": {
+    "CIM_macro_area_mm2": 0.0032,
+    "CIM_access_ns": 5.5,
+    "signed_K_macros": 4096,
+    "signed_K_macro_area_mm2": 13.1072,
+    "FP16_V_bytes": 4194304,
+    "FP16_V_SRAM_macros": 128,
+    "FP16_V_SRAM_area_mm2": 1.1491243835616438,
+    "FIFO_macros": 27,
+    "FIFO_area_mm2": 0.24239342465753425,
+    "assumed_peripheral_area_mm2": 0.5,
+    "used_area_mm2": 14.998717808219178,
+    "budget_mm2": 16,
+    "score_bytes_eliminated_per_layer": 262144,
+    "context_LSE_output_bytes_per_layer": 8320,
+    "transfer_reduction": 31.50769230769231
+  },
+  "conditional_rates": {
+    "external_KV_source_program_context_Bps": 1000000000000,
+    "local_V_SRAM_Bps": 16000000000000,
+    "local_V_per_macro_GBps": 125,
+    "unsigned_macro_active_port_cap": 256,
+    "digitized_softmax_exp_per_s": 1000000000000,
+    "signed_scaling_reduction_ops_per_s": 1000000000000,
+    "digital_PV_MAC_per_s": 64000000000000,
+    "minimum_PV_MAC_density_TMAC_per_s_per_mm2_at_full_support_allocation": 128,
+    "controller_time_s": 0,
+    "unmodeled_setup_s": 0
+  },
+  "reference": {
+    "cold_KV_supply_and_program_us_once": 12.582912,
+    "steady_prefix_context_us": 0.830632,
+    "mean_prefix_context_us": 0.928936,
+    "source_legacy_A100_element_bug_QK_us": 1.0626699362432563,
+    "corrected_A100_HBM_QK_us": 2.1253398724865127,
+    "corrected_A100_L2_QK_us": 0.6002836879432625,
+    "source_unfused_HBM_QK_softmax_PV_us": 4.44352721922511,
+    "source_unfused_L2_QK_softmax_PV_us": 1.294709745206199,
+    "margin_vs_HBM_QK_proxy_us": 1.1964038724865125,
+    "margin_vs_L2_QK_proxy_us": -0.3286523120567377,
+    "margin_vs_HBM_unfused_full_us": 3.5145912192251094,
+    "margin_vs_L2_unfused_full_us": 0.3657737452061991,
+    "full_decoder_tpot_s": null,
+    "GPU_speedup": null
+  },
+  "sweep": {
+    "rows": 72,
+    "batches": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "V_read_TBps": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "digital_PV_TMAC_per_s": [
+      4,
+      16,
+      64
+    ],
+    "HBM_QK_proxy_model_positive": 16,
+    "L2_QK_proxy_model_positive": 0,
+    "HBM_unfused_full_source_positive": 58,
+    "L2_unfused_full_source_positive": 8
+  },
+  "verification": [
+    "Independent local Python reimplementation executes exact K/V macro area, cold-start and stage FIFO scheduling arithmetic.",
+    "Online softmax and prefix/suffix fusion regression passed as part of the full 156-discovered-test GitHub source CI, one optional test skipped.",
+    "GPU source model FP16 Matmul.roofline_model counts IO elements but divides by bytes/s, a factor-2 memory-term undercount; source corrected separately without overwriting raw evidence.",
+    "The larger prefix context endpoint is numerically meaningful only after matching ADC digitized-score response; preserving FP16 V avoids new V quantization."
+  ],
+  "limitations": [
+    "Optimized fused Hydragen/FlashAttention GPU full-prefix execution remains unmeasured and unmodeled.",
+    "A100 FP16 source model used as legacy simulation; no A100 physical device, no H100 data substitution.",
+    "16TB/s V read and 64TMAC/s digital PV with ≤0.5mm2 support are speculative rate sensitivities, not established 7nm digital area.",
+    "Rate model reuses full V SRAM per microbatch; GQA multicast within each batch group.",
+    "Only a single pinned layer can fit at selected geometry; prefix context output for 31 other layers is unchanged GPU work.",
+    "Potential performance benefits are isolated prefix-context service, not full-decoder TPOT or energy."
+  ],
+  "qualification": {
+    "source_cim_ci": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/41868345731",
+    "tests_discovered": 156,
+    "tests_passed": 155,
+    "tests_skipped": 1,
+    "source_cim_sweep_rows": 576,
+    "source_cim_sweep_counts": {
+      "model_below_corrected_HBM_GPU_QK_proxy": 92,
+      "model_below_corrected_HBM_GPU_unfused_full_prefix_only": 244,
+      "model_not_below_corrected_HBM_GPU_unfused_full_prefix": 240
+    },
+    "source_magma_ci": "https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41868354178",
+    "native_magma_six_batch_QK_softmax_PV": "SUCCESS",
+    "supported": "source-anchored conditional simulations; not CUDA-measured or fabricated integrated CIM"
+  }
+}
