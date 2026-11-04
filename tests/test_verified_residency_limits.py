@@ -13,6 +13,7 @@ from cim_shared_prefix.verified_residency_limits import (
     capacity_limit,minimum_touched_layers_for_persistent_tiles,
     dense_llama_weight_parameters,fp16_decoder_weight_bytes,
     A100_L2_NOMINAL_BYTES,A100_80GB_SXM_HBM_BPS,
+    fused_gpu_floor_and_requirements,A100_L2_MODEL_BPS,
 )
 
 
@@ -88,6 +89,32 @@ class PhysicalResidencyProofTests(unittest.TestCase):
                     self.assertEqual(
                         minimum_touched_layers_for_persistent_tiles(target,tiles_per_layer),
                         best)
+
+    def test_ideal_fused_GPU_source_rate_lower_floors(self):
+        h=fused_gpu_floor_and_requirements(2048,1,16,"HBM")
+        l=fused_gpu_floor_and_requirements(2048,1,16,"L2")
+        self.assertEqual(h.native_FP16_prefix_KV_bytes_per_layer,8388608)
+        self.assertEqual(h.native_attention_QK_plus_PV_flops_per_layer,33554432)
+        self.assertEqual(h.digital_PV_MACs_per_layer,8388608)
+        self.assertEqual(h.resident_FP16_V_read_bytes_per_layer,4194304)
+        self.assertAlmostEqual(h.ideal_fused_GPU_prefix_floor_s*1e6,
+                               4.114079450711134,places=11)
+        self.assertAlmostEqual(h.necessary_local_V_read_bandwidth_Bps,
+                               1.0195e12,delta=1)
+        self.assertAlmostEqual(h.necessary_digital_PV_MAC_per_s,
+                               2.039e12,delta=1)
+        self.assertAlmostEqual(l.necessary_local_V_read_bandwidth_Bps,
+                               A100_L2_MODEL_BPS/2,delta=1)
+        self.assertAlmostEqual(l.necessary_digital_PV_MAC_per_s,
+                               A100_L2_MODEL_BPS,delta=1)
+        self.assertLess(l.ideal_fused_GPU_prefix_floor_s,h.ideal_fused_GPU_prefix_floor_s)
+        self.assertIsNotNone(l.necessary_PV_MAC_density_per_s_per_mm2)
+        self.assertGreater(l.necessary_PV_MAC_density_per_s_per_mm2,
+                           h.necessary_PV_MAC_density_per_s_per_mm2)
+        with self.assertRaises(ValueError):
+            fused_gpu_floor_and_requirements(2048,1,16,"unknown")
+        with self.assertRaises(ValueError):
+            fused_gpu_floor_and_requirements(2048,0,16,"HBM")
 
     def test_no_setup_or_digital_area_implicitly_claimed(self):
         z=capacity_limit(2048,0.0)
