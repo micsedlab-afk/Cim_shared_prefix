@@ -101,3 +101,20 @@ If the feasible region disappears, that is a scientifically useful negative syst
 **Gate F (conclusions):** regenerate only the matched, scenario-labeled exclusion/frontier results. Report bottleneck dominance, lower and serial conditional times, score-output bandwidth requirements and area caps. Novelty evaluated on the demonstrated new physical frontiers and GPU comparison, not on an unvalidated optimizer.
 
 **Do not** use 2ms deadline as a GPU timing. **Do not** derive a 7nm integrated silicon design or frequency from a fabricated macro. **Do not** call the R2/R3 QK path numerically exact. **Do not** report energy advantage from unsupported GPU/CIM system power.
+
+## 8. Audit addendum — live integration at `67ed4b4fa628`
+
+The integration branch advanced by four commits after the `104debe5` snapshot. The audit's claims about **missing qualified GPU timing** remain valid, but implementation status must be updated:
+
+- `src/cim_shared_prefix/gpu_attention.py` now implements grouped-prefix GPU GEMM, full SDPA and GPU-side post-CIM score remainder, with a common *attention-context output* endpoint.
+- `scripts/benchmark_gpu_attention.py` now instruments actual CUDA kernel candidates via CUDA events and profiler, enforces FP16/BF16 and GQA geometry, and records GPU identifiers. **No A100 measurement file was found in the integration repository; the latest CI is CPU-only and tests its fail-closed behavior.**
+- `scripts/benchmark_real_decoder.py` profiles real pretrained-weight decode only on a CUDA-enabled machine. It explicitly labels the ordinary Hugging Face SDPA baseline as **not Hydragen optimized**.
+- `tests/test_gpu_attention.py` verifies MHA/GQA numerical functional agreement and absence of fabricated records on CPU.
+- Latest full CI `41818658065` at `67ed4b4fa628` succeeded. This is **CPU regression**, not GPU measurement.
+
+**Remaining GPU qualification**: execute on verified A100; confirm installed kernel identity and fair preassembly/cache assumptions; time optimized Hydragen, native full-SDPA, real decoder; compare the same output endpoints, precision, batch, prefix and suffix. If run on H100, retain a distinct hardware class and exclude the record from the primary A100 N7 comparison.
+
+**Numerical terminology correction still required**: `gpu_attention.py` may legitimately call its floating-point full attention reference exact (mathematically up to numeric rounding); the complete CIM path must remain labeled *approximate Q4/K4/O4 physical-response emulation*. Its GPU-side remainder currently accepts arbitrary FP32 prefix score tensors; its equality tests with BF16 prefix scores do **not** establish the actual Q4/K4/O4 ADC response equivalence.
+
+**Operator profiling semantics**: layer-level per-kernel CUDA timing must not be naively added to uninstrumented full decoder TPOT. End-to-end output timings need a complete causal model and actual measured hardware state.
+
