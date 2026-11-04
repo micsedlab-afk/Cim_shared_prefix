@@ -33,6 +33,10 @@ FP16_BYTES=2
 LLAMA_CONFIG_SOURCE=LLAMA.source_url
 A100_80GB_SXM_HBM_BPS=2039e9
 A100_L2_NOMINAL_BYTES=40_000_000
+# L2 interface and FP16 dense peak are from vendored LLMCompass A100 source;
+# throughput is a model peak, not a CUDA measurement.
+A100_L2_MODEL_BPS=5120*1.41e9
+A100_FP16_DENSE_FLOPS_PER_S=312e12
 A100_PUBLIC_DOC="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/"
 A100_SOURCE="https://www.nvidia.com/en-us/data-center/a100/"
 
@@ -187,4 +191,71 @@ def capacity_limit(prefix_tokens:int,area_budget_mm2:float)->ResidentLimit:
         uniform_layer_prefix_attention_speedup_ceiling=(
             L/(L-max_layer) if max_layer<L else None
         ),
+    )
+
+
+@dataclass(frozen=True)
+class FusedGPUFloorAndNearMemoryRequirements:
+    """Best-case fused GPU prefix and necessary local SRAM/digital rates.
+
+    This is a *necessary* memory/computation lower floor, not a measured
+    fused attention latency. It ignores kernel launches, score materialization,
+    exp/reduction costs, Q input/output and cache miss effects. Requirements
+    for near-memory PV are rates that would have to be exceeded to match
+    this floor with all other near-memory work unrealistically free.
+    """
+    prefix_tokens: int
+    batch: int
+    source_memory_placement: str
+    modeled_available_GPU_KV_bandwidth_Bps: float
+    native_FP16_prefix_KV_bytes_per_layer: int
+    native_attention_QK_plus_PV_flops_per_layer: int
+    ideal_fused_GPU_prefix_floor_s: float
+    resident_FP16_V_read_bytes_per_layer: int
+    digital_PV_MACs_per_layer: int
+    necessary_local_V_read_bandwidth_Bps: float
+    necessary_digital_PV_MAC_per_s: float
+    max_nonmemory_area_mm2_under_16mm2_without_buffers: float
+    necessary_PV_MAC_density_per_s_per_mm2: float | None
+    evidence: str = ("A100_peak_KV_byte_and_compute_floor;published_7nm_"
+                     "storage_capacity;near_memory_rate_necessity_not_sufficiency")
+
+    def json_record(self)->dict:
+        return asdict(self)
+
+
+def fused_gpu_floor_and_requirements(prefix_tokens:int,batch:int,
+                                    area_budget_mm2:float,
+                                    placement:str)->FusedGPUFloorAndNearMemoryRequirements:
+    """Same native GQA geometry, exact prefix KV size and FP16 FMA count.
+
+    Memory placements "HBM" and "L2" are separate ideal cases and MUST
+    not be merged into a fabricated measured GPU reference.
+    """
+    if placement not in ("HBM","L2"):
+        raise ValueError("source GPU memory placement must be HBM or L2")
+    if type(batch) is not int or batch<=0:
+        raise ValueError("positive integer batch required")
+    c=capacity_limit(prefix_tokens,area_budget_mm2)
+    bw=A100_80GB_SXM_HBM_BPS if placement=="HBM" else A100_L2_MODEL_BPS
+    kv_bytes=c.gpu_fp16_prefix_KV_bytes_per_layer
+    flops=4*batch*LLAMA.query_heads*prefix_tokens*LLAMA.head_dim
+    floor_s=max(kv_bytes/bw,flops/A100_FP16_DENSE_FLOPS_PER_S)
+    v_bytes=LLAMA.kv_heads*prefix_tokens*LLAMA.head_dim*FP16_BYTES
+    macs=batch*LLAMA.query_heads*prefix_tokens*LLAMA.head_dim
+    remaining=area_budget_mm2-c.complete_kv_macro_area_mm2_per_layer
+    density=(macs/floor_s/remaining if remaining>0 else None)
+    return FusedGPUFloorAndNearMemoryRequirements(
+        prefix_tokens=prefix_tokens,batch=batch,
+        source_memory_placement=placement,
+        modeled_available_GPU_KV_bandwidth_Bps=bw,
+        native_FP16_prefix_KV_bytes_per_layer=kv_bytes,
+        native_attention_QK_plus_PV_flops_per_layer=flops,
+        ideal_fused_GPU_prefix_floor_s=floor_s,
+        resident_FP16_V_read_bytes_per_layer=v_bytes,
+        digital_PV_MACs_per_layer=macs,
+        necessary_local_V_read_bandwidth_Bps=v_bytes/floor_s,
+        necessary_digital_PV_MAC_per_s=macs/floor_s,
+        max_nonmemory_area_mm2_under_16mm2_without_buffers=max(0.0,remaining),
+        necessary_PV_MAC_density_per_s_per_mm2=density,
     )
