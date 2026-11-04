@@ -1,7 +1,7 @@
 name: GPU evidence and integrated regression
 on:
   push:
-    branches: [integration/final-framework, implementation/causal-simulation-20261104]
+    branches: [integration/final-framework, implementation/causal-simulation-20261104, implementation/gpu-saving-frontier-20261104]
     paths-ignore:
       - 'results/integration/**'
       - 'results/gpu/**'
@@ -62,4 +62,27 @@ jobs:
         with:
           name: executed-causal-source-macro-timeline
           path: /tmp/cim-causal-llama-2048-128.json
+          if-no-files-found: ignore
+
+      - name: Convert executed study into matched GPU savings threshold
+        run: |
+          python scripts/derive_gpu_saving_thresholds.py \
+            --csv /tmp/gpu-qk-saving-thresholds.csv \
+            --summary /tmp/gpu-qk-saving-reference.json
+          python - <<'PY'
+          import csv,json
+          with open('/tmp/gpu-qk-saving-thresholds.csv') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==2304
+          x=json.load(open('/tmp/gpu-qk-saving-reference.json'))
+          assert abs(x['reference_coordinate']['serial_policy_break_even_saving_us_per_layer']-6.058113)<1e-7
+          assert all(r['competitive_speedup']=='' for r in rows)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-derived-GPU-QK-savings-frontier
+          path: |
+            /tmp/gpu-qk-saving-thresholds.csv
+            /tmp/gpu-qk-saving-reference.json
           if-no-files-found: ignore
