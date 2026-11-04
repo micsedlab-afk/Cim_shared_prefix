@@ -108,7 +108,7 @@ class ContextPipeline:
         "signed_reduction", "local_V_SRAM_fetch",
         "online_stable_softmax", "FP16V_FP32_PV_accumulate",
     )
-    evidence: str = "published_7nm_macro_geometry_plus_explicit_digital_bandwidth_and_area_sensitivities"
+    evidence: str = "published_7nm_macro_geometry_plus_unqualified_digital_bandwidth_and_area_sensitivities"
 
     def json_record(self):
         return asdict(self)
