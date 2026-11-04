@@ -215,7 +215,7 @@ class FusedGPUFloorAndNearMemoryRequirements:
     digital_PV_MACs_per_layer: int
     necessary_local_V_read_bandwidth_Bps: float
     necessary_digital_PV_MAC_per_s: float
-    max_nonmemory_area_mm2_under_16mm2_without_buffers: float
+    maximum_area_left_after_KV_macros_mm2: float
     necessary_PV_MAC_density_per_s_per_mm2: float | None
     evidence: str = ("A100_peak_KV_byte_and_compute_floor;published_7nm_"
                      "storage_capacity;near_memory_rate_necessity_not_sufficiency")
@@ -256,6 +256,6 @@ def fused_gpu_floor_and_requirements(prefix_tokens:int,batch:int,
         digital_PV_MACs_per_layer=macs,
         necessary_local_V_read_bandwidth_Bps=v_bytes/floor_s,
         necessary_digital_PV_MAC_per_s=macs/floor_s,
-        max_nonmemory_area_mm2_under_16mm2_without_buffers=max(0.0,remaining),
+        maximum_area_left_after_KV_macros_mm2=max(0.0,remaining),
         necessary_PV_MAC_density_per_s_per_mm2=density,
     )
