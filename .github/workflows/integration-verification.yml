@@ -86,3 +86,27 @@ jobs:
             /tmp/gpu-qk-saving-thresholds.csv
             /tmp/gpu-qk-saving-reference.json
           if-no-files-found: ignore
+
+
+      - name: Execute paired A100 source roofline vs published 7nm CIM model
+        run: |
+          python scripts/compare_native_a100_model_7nm.py \
+            --out /tmp/paired-a100-fp16-vs-7nm-cim-model.json
+          python - <<'PY'
+          import json, math
+          v=json.load(open('/tmp/paired-a100-fp16-vs-7nm-cim-model.json'))
+          assert v['status']=='EXECUTED_SOURCE_ROOFLINE_VS_7NM_MACRO_SERIAL_MODEL'
+          assert len(v['token_points'])==128
+          assert math.isclose(v['source_roofline_saving_us_per_layer'],1.0606611083864643,rel_tol=1e-9)
+          assert math.isclose(v['source_threshold_us_per_layer'],6.058113,rel_tol=1e-9)
+          assert math.isclose(v['S2_minus_S0_attention_model_difference_s_per_generated_token']*1e6,159.91846053163314,rel_tol=1e-9)
+          assert v['global_GPU_vs_CIM_speedup'] is None
+          assert v['qualified_end_to_end_TPOT_s'] is None
+          assert v['GPU_source']['measured_hardware'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paired-source-native-a100-gqa-fp16-vs-7nm-cim
+          path: /tmp/paired-a100-fp16-vs-7nm-cim-model.json
+          if-no-files-found: ignore
