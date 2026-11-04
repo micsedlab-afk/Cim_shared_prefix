@@ -23,12 +23,14 @@ jobs:
           python scripts/run_verified_capacity_study.py \
             --csv /tmp/source_7nm_kv_capacity_envelope.csv \
             --rate-csv /tmp/source_fused_gpu_HBM_L2_required_rates.csv \
+            --crossmodel-csv /tmp/native_GQA_MHA_macro_capacity.csv \
             --summary /tmp/source_7nm_kv_capacity_summary.json
           python - <<'PY'
           import csv,json
           x=json.load(open('/tmp/source_7nm_kv_capacity_summary.json'))
           assert x['case_count']==136
           assert x['ideal_fused_GPU_rate_boundary_cases']==34
+          assert x['cross_native_model_geometry_count']==14
           m=x['main_16mm2_P2048']
           assert m['max_complete_layers_without_peripherals']==1
           assert m['max_persistent_16token_layer_tiles_without_peripherals']==143
@@ -44,6 +46,8 @@ jobs:
           assert abs(l['necessary_digital_PV_MAC_per_s']-7.2192e12)<.1
           with open('/tmp/source_fused_gpu_HBM_L2_required_rates.csv') as f:
               assert len(list(csv.DictReader(f)))==34
+          with open('/tmp/native_GQA_MHA_macro_capacity.csv') as f:
+              assert len(list(csv.DictReader(f)))==14
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -51,5 +55,6 @@ jobs:
           path: |
             /tmp/source_7nm_kv_capacity_envelope.csv
             /tmp/source_fused_gpu_HBM_L2_required_rates.csv
+            /tmp/native_GQA_MHA_macro_capacity.csv
             /tmp/source_7nm_kv_capacity_summary.json
           if-no-files-found: error
