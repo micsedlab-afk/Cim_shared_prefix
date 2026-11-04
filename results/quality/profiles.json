@@ -26,14 +26,14 @@
     },
     {
       "model_id": "facebook/opt-2.7b",
-      "revision": "main (config; re-pin before execution)",
+      "revision": "905a4b602cda5c501f1b3a2650a4152680238254",
       "query_heads": 32,
       "kv_heads": 32,
       "head_dim": 80,
       "layers": 32,
       "max_positions": 2048,
       "sliding_window": null,
-      "source_url": "https://huggingface.co/facebook/opt-2.7b/blob/main/config.json"
+      "source_url": "https://huggingface.co/facebook/opt-2.7b/blob/905a4b602cda5c501f1b3a2650a4152680238254/config.json"
     }
   ],
   "sweep": {

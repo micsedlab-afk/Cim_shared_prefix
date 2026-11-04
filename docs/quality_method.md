@@ -103,3 +103,7 @@ The October batch-2 helper trial in
 remains blocked: R0 scalar-vs-batch per-token NLL failed the fixed
 2e-5 equivalence criterion. Its development sample numbers must not
 be mixed into this n=8 scalar result or advertised as batch-2 quality.
+
+## Extended quality implementation
+
+See [extended_quality_method.md](extended_quality_method.md) for exact pinned OPT/Mistral revisions, BF16 R0 reference, separate model-specific ADC calibration, native attention semantics, and GPU execution gates. The recovered 96-unit Llama R0–R3 archive, original NLL/PPL and bootstrap intervals remain unchanged. Model-specific quality results are pending full-model GPU execution; geometry sweeps remain geometry-only.

@@ -1,0 +1,34 @@
+{
+  "schema": "model_quality_extension_status/v1",
+  "parent_branch": "work/quality-workloads",
+  "preserved_llama_evaluated_units": 96,
+  "quality_claim_boundary": "new-model inference has not run; no fabricated or geometry-derived perplexity",
+  "environment": {
+    "cuda_available": false,
+    "transformers_4_46_2_installed": false,
+    "pinned_weight_snapshots_available": false
+  },
+  "models": {
+    "mistralai/Mistral-7B-v0.1": {
+      "revision": "17688039ea7b7001c702797eed2ab7716a0cc3c2",
+      "status": "NUMERICAL_EVALUATION_PENDING",
+      "required_units": 96,
+      "evaluated_units": 0,
+      "model_specific_adc_calibrated": false,
+      "attention": "native GQA, 4096-token sliding window"
+    },
+    "facebook/opt-2.7b": {
+      "revision": "905a4b602cda5c501f1b3a2650a4152680238254",
+      "status": "NUMERICAL_EVALUATION_PENDING",
+      "required_units": 96,
+      "evaluated_units": 0,
+      "model_specific_adc_calibrated": false,
+      "attention": "native MHA, maximum position 2048, 80 active rows padded to 128"
+    }
+  },
+  "local_validation": {
+    "cpu_only_unit_tests_passed": 10,
+    "gpu_fail_closed_gate_passed": true,
+    "full_model_numerical_equivalence_passed": false
+  }
+}

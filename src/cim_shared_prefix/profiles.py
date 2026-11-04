@@ -46,9 +46,9 @@ PROFILES = (
                  4096, 32, 32768,
                  "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/17688039ea7b7001c702797eed2ab7716a0cc3c2/config.json",
                  sliding_window=4096),
-    ModelProfile("facebook/opt-2.7b", "main (config; re-pin before execution)",
+    ModelProfile("facebook/opt-2.7b", "905a4b602cda5c501f1b3a2650a4152680238254",
                  32, 32, 2560, 32, 2048,
-                 "https://huggingface.co/facebook/opt-2.7b/blob/main/config.json"),
+                 "https://huggingface.co/facebook/opt-2.7b/blob/905a4b602cda5c501f1b3a2650a4152680238254/config.json"),
 )
 
 
