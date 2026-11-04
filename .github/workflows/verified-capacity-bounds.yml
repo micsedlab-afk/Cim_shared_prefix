@@ -22,11 +22,13 @@ jobs:
         run: |
           python scripts/run_verified_capacity_study.py \
             --csv /tmp/source_7nm_kv_capacity_envelope.csv \
+            --rate-csv /tmp/source_fused_gpu_HBM_L2_required_rates.csv \
             --summary /tmp/source_7nm_kv_capacity_summary.json
           python - <<'PY'
           import csv,json
           x=json.load(open('/tmp/source_7nm_kv_capacity_summary.json'))
           assert x['case_count']==136
+          assert x['ideal_fused_GPU_rate_boundary_cases']==34
           m=x['main_16mm2_P2048']
           assert m['max_complete_layers_without_peripherals']==1
           assert m['max_persistent_16token_layer_tiles_without_peripherals']==143
@@ -36,11 +38,18 @@ jobs:
               rows=list(csv.DictReader(f))
           assert len(rows)==136
           assert all('conditional' not in r['evidence'] for r in rows)
+          h=x['source_ideal_fused_GPU_HBM_P2048_B1']
+          l=x['source_ideal_fused_GPU_L2_P2048_B1']
+          assert abs(h['necessary_local_V_read_bandwidth_Bps']-1.0195e12)<.1
+          assert abs(l['necessary_digital_PV_MAC_per_s']-7.2192e12)<.1
+          with open('/tmp/source_fused_gpu_HBM_L2_required_rates.csv') as f:
+              assert len(list(csv.DictReader(f)))==34
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: published-7nm-physical-capacity-and-GPU-source-byte-envelopes
           path: |
             /tmp/source_7nm_kv_capacity_envelope.csv
+            /tmp/source_fused_gpu_HBM_L2_required_rates.csv
             /tmp/source_7nm_kv_capacity_summary.json
           if-no-files-found: error
