@@ -1,0 +1,112 @@
+{
+  "model": "analytical macro-residency + serial physical traffic lower bounds; conditional digital break-even",
+  "technology": "published 7nm SRAM/CIM macros; external integration unsupported",
+  "source_anchors": {
+    "cim": {
+      "name": "Dong et al., ISSCC 2020; Sinangil et al., JSSC 2021",
+      "url": "https://doi.org/10.1109/ISSCC19947.2020.9062985",
+      "jssc_doi": "https://doi.org/10.1109/JSSC.2020.3031290",
+      "physical_macro_mm2": 0.0032,
+      "macro_bits": 4096,
+      "unsigned_4b4b_mav_per_cycle": 1024,
+      "access_seconds": 5.5e-09,
+      "headline_GOPS": 372.4,
+      "ops_count_per_native_mav": 2,
+      "signed_key_planes": 2,
+      "native_evaluations_per_signed_Q4K4": 4,
+      "output_precision": "macro 4-bit ADC/average; 32-bit completed-score postprocess UNCHARACTERIZED"
+    },
+    "sram": {
+      "name": "Yokoyama et al., VLSI 2020",
+      "url": "https://doi.org/10.1109/VLSICircuits18222.2020.9162985",
+      "macro_bits": 262144,
+      "macro_Mbit_per_mm2": 29.2,
+      "macro_area_mm2": 0.008977534246575342,
+      "read_write_porting": "NOT qualified for required bandwidth"
+    }
+  },
+  "key_mapping": "CIM 64 reduction rows x 16 4b score columns; 2 banks per signed tile",
+  "area_scope": "physical macro count once, 6 external-area components as explicit sensitivities; GPU die excluded",
+  "time_scope": "serial layer visits and stages; no assumed interstage overlap; initial programming amortized over output_tokens",
+  "first_token": "cold",
+  "programming_mode": "valid_bits optimistic; whole_macro irregular sensitivity",
+  "full_model_instantiated_macro_footprints_mm2": {
+    "CIM_P2048": 419.4304,
+    "CIM_active_P2048": 13.1072,
+    "SRAM_P2048": 9.19299506849315,
+    "SRAM_active_P2048": 0.28728109589041095
+  },
+  "sweep": {
+    "rows": 6144,
+    "budgets_mm2": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "prefix_tokens": [
+      512,
+      2048,
+      8192
+    ],
+    "batch": [
+      1,
+      8
+    ],
+    "output_tokens": [
+      32,
+      128
+    ],
+    "support_each_path_mm2": [
+      0,
+      0.5
+    ],
+    "programming_Bps": [
+      100000000000.0,
+      1000000000000.0
+    ],
+    "output_Bps": [
+      250000000000.0,
+      1000000000000.0
+    ],
+    "SRAM_Bps": [
+      250000000000.0,
+      1000000000000.0
+    ],
+    "query_Bps": "same value as output_Bps",
+    "reduction_adds_per_s": 1000000000000.0,
+    "controller_s": 0,
+    "digital_reuse": "1 or batch*GQA; unqualified mapping extremes",
+    "target_s_sensitivity": 0.002,
+    "CIM_statuses": {
+      "macro_only_optimistic_target_met": 5064,
+      "time_bound_missed": 1080
+    },
+    "digital_statuses": {
+      "conditional_MAC_density": 4958,
+      "no_MAC_time": 1186
+    },
+    "physical_digital_isoarea_count": 0
+  },
+  "qualification": {
+    "physical_macro_area": "published complete macro; yes",
+    "complete_CIM_signed_Q4K4_layout": "no",
+    "actual_7nm_digital_MAC_physical_area": "absent",
+    "completed_score_accuracy": "not established by 4-bit CIM ADC",
+    "real_MAC_speedup": "not claimed",
+    "qualified_digital_isoarea": "not available",
+    "SCALE-Sim_executed": "not executed; package unavailable"
+  }
+}
