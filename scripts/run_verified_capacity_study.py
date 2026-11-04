@@ -18,14 +18,14 @@ from cim_shared_prefix.verified_residency_limits import (
     capacity_limit, dense_llama_weight_parameters,
     fp16_decoder_weight_bytes, A100_80GB_SXM_HBM_BPS,
     A100_L2_NOMINAL_BYTES, A100_PUBLIC_DOC, A100_SOURCE,
-    LLAMA_CONFIG_SOURCE, fused_gpu_floor_and_requirements,
+    LLAMA_CONFIG_SOURCE, fused_gpu_floor_and_requirements, cross_model_macro_bound,
 )
 
 PREF=(16,32,64,80,128,256,304,320,384,512,768,1024,1536,2048,2304,3072,4096)
 BUDGETS=(1,2,4,8,16,32,64,128)
 
 
-def execute(csv_path:Path,summary_path:Path,rate_csv_path:Path,
+def execute(csv_path:Path,summary_path:Path,rate_csv_path:Path,crossmodel_csv_path:Path,
             prefixes=PREF,area_budgets=BUDGETS):
     rows=[capacity_limit(p,area).json_record() for area in area_budgets for p in prefixes]
     if not rows:
@@ -42,6 +42,20 @@ def execute(csv_path:Path,summary_path:Path,rate_csv_path:Path,
         wr=csv.DictWriter(fd,fieldnames=list(rates[0]))
         wr.writeheader()
         wr.writerows(rates)
+    # Native model configurations; preserve OPT 2K context and Mistral
+    # sliding-window first-token semantics. Do not invent numerical quality.
+    crossmodels=(
+       ("meta-llama/Llama-3.1-8B",(256,512,1024,2048,4096)),
+       ("mistralai/Mistral-7B-v0.1",(256,512,1024,2048,4096)),
+       ("facebook/opt-2.7b",(256,512,1024,1792)),
+    )
+    crossrows=[cross_model_macro_bound(mid,p,128,128,16).json_record()
+               for mid,prefixes_for_model in crossmodels for p in prefixes_for_model]
+    crossmodel_csv_path.parent.mkdir(parents=True,exist_ok=True)
+    with crossmodel_csv_path.open("w",newline="") as f:
+        wr=csv.DictWriter(f,fieldnames=list(crossrows[0]))
+        wr.writeheader()
+        wr.writerows(crossrows)
     main=capacity_limit(2048,16)
     multi=capacity_limit(4096,16)
     short=capacity_limit(64,16)
@@ -78,6 +92,8 @@ def execute(csv_path:Path,summary_path:Path,rate_csv_path:Path,
         "area_budgets_mm2":list(area_budgets),
         "prefixes":list(prefixes),
         "case_count":len(rows),
+        "cross_native_model_geometry_count":len(crossrows),
+        "native_model_macro_only_cases":crossrows,
         "ideal_fused_GPU_rate_boundary_cases":len(rates),
         "bound_scope":[
             "fixed 7nm complete signed K4 CIM and complete 7nm FP16 V SRAM macros only",
@@ -114,5 +130,6 @@ if __name__=="__main__":
     ap.add_argument("--csv",type=Path,required=True)
     ap.add_argument("--summary",type=Path,required=True)
     ap.add_argument("--rate-csv",type=Path,required=True)
+    ap.add_argument("--crossmodel-csv",type=Path,required=True)
     args=ap.parse_args()
-    execute(args.csv,args.summary,args.rate_csv)
+    execute(args.csv,args.summary,args.rate_csv,args.crossmodel_csv)
