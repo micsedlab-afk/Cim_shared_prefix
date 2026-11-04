@@ -138,3 +138,28 @@ jobs:
             /tmp/selective-pipeline-conditions.csv
             /tmp/selective-pipeline-reference.json
           if-no-files-found: error
+
+
+      - name: Compare against grouped shared-prefix GPU native source model
+        run: |
+          python scripts/compare_grouped_gpu_7nm_selective.py \
+            --csv /tmp/grouped-gpu-vs-selective-cim.csv \
+            --json /tmp/grouped-gpu-vs-selective-cim.json
+          python - <<'PY'
+          import csv,json,math
+          r=json.load(open('/tmp/grouped-gpu-vs-selective-cim.json'))
+          assert len(r['rows'])==6
+          assert [x['batch'] for x in r['rows']]==[1,2,4,8,16,32]
+          assert r['rows'][0]['status']=='CONDITIONAL_QK_WIN'
+          assert r['rows'][0]['modeled_hybrid_minus_GPU_us_per_token']<0
+          for row in r['rows']:
+              assert row['buffer_area_mm2']<=.1+1e-12
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grouped-native-shared-prefix-GPU-vs-7nm-selective
+          path: |
+            /tmp/grouped-gpu-vs-selective-cim.csv
+            /tmp/grouped-gpu-vs-selective-cim.json
+          if-no-files-found: error
