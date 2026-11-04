@@ -1,0 +1,11 @@
+Lp,Lu,full_residency_macro_area_mm2,native_macro_calls_per_token,score_transfer_bytes_per_token,source
+1024,128,209.7152,524288,4194304,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+1024,256,209.7152,524288,4194304,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+2048,128,419.4304,1048576,8388608,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+2048,256,419.4304,1048576,8388608,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+4096,128,838.8608,2097152,16777216,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+4096,256,838.8608,2097152,16777216,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+8192,128,1677.7216,4194304,33554432,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+8192,256,1677.7216,4194304,33554432,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+16384,128,3355.4432,8388608,67108864,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md
+16384,256,3355.4432,8388608,67108864,micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md

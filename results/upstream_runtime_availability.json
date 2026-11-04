@@ -1,0 +1,26 @@
+{
+  "acquisition_note": "Git connector can read repository code but local git clone requires network authentication; no secret files recorded",
+  "full_native_MAGMA_HBM4PiM_available": false,
+  "repos": {
+    "HBM4PiM": {
+      "source": "scripts/acquire_upstreams.sh",
+      "status": "SOURCE_CHECKOUT_NOT_AVAILABLE"
+    },
+    "MAGMA-gpt": {
+      "source": "scripts/acquire_upstreams.sh",
+      "status": "SOURCE_CHECKOUT_NOT_AVAILABLE"
+    },
+    "SRAM2LLM": {
+      "source": "scripts/acquire_upstreams.sh",
+      "status": "SOURCE_CHECKOUT_NOT_AVAILABLE"
+    },
+    "shared_prefix_cim": {
+      "exact_upstream_blob_match": true,
+      "ideal_macro_blob_sha": "6e968ef3b4cd2b09529930ad24cce66425ff93e0",
+      "mapping_blob_sha": "78c30ae3996f1cd830d2a6d08ebb1685cedbe645",
+      "original_repo_checkout": false,
+      "status": "PARTIAL_SHA_VERIFIED_SOURCE_FILES"
+    }
+  },
+  "schema": "cim-shared-prefix-upstream-availability/v1"
+}

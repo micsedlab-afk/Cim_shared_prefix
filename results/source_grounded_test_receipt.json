@@ -1,0 +1,27 @@
+{
+  "full_Magma_or_HBM4PiM_simulations_executed": false,
+  "generated_sensitivity_coordinates": 720,
+  "local_tests_passed": 27,
+  "native_macro_arithmetic_calls": 96,
+  "original_repository_existing_tests_executed_in_this_runtime": false,
+  "qualified_end_to_end_tpot_coordinates": 0,
+  "rationale": "Container lacked original source checkout of target repository and unavailable native upstream provider; tests test added modules against local contract shim. Existing committed files preserved untouched.",
+  "return_code": 0,
+  "schema": "cim-shared-prefix-local-qualification/v1",
+  "source_blob_validation": true,
+  "source_sha256": {
+    "results/native_sinangil_arithmetic_receipt.json": "701c88e61a39fb62232b2fd3065e63c0de8b6527cdeb82ce4b868ea349b38fec",
+    "results/source_grounded_sensitivity.csv": "e4979c990c54275011533ac5572e6be96e80e48e94c85541fe341936392982f2",
+    "scripts/run_source_sweep.py": "4ff9e783fdf854abef4874b73a7850ad30e60186673541c14d17b9a59b89fa43",
+    "src/cim_shared_prefix/gqa_native.py": "1e463a66874dcd07ec824ec5e4455c7263d11ffaffac27fe7b66e9f9e134b314",
+    "src/cim_shared_prefix/source_grounded.py": "e8caa2462756ac924c43d41a488482ef6c862801bb49e402cdeb6c35464a02ef",
+    "tests/test_source_grounded.py": "bc0a807f2344bcfb126b730b8be4c7781b5d704ad163eb35d810984737581c45"
+  },
+  "test_command": "PYTHONPATH=src python -m unittest discover -s tests -v",
+  "tested_paths": [
+    "tests/test_source_grounded.py"
+  ],
+  "total_upstream_macro_calls": 160,
+  "upstream_original_source_execution": true,
+  "upstream_signed_mapping_macro_calls": 64
+}

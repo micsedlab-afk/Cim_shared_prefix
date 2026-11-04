@@ -1,0 +1,138 @@
+{
+  "all_synthetic_periphery_results_are_sensitivity_only": true,
+  "coordinate_count": 720,
+  "extended_serving_sensitivity_axes": {
+    "B": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "O": [
+      1,
+      32,
+      128
+    ],
+    "active_ports_assumed": 256,
+    "link_and_program_Bps": [
+      100000000000.0,
+      1000000000000.0
+    ],
+    "macro_budget": [
+      "4096",
+      "32768",
+      "full_residency"
+    ]
+  },
+  "missing_model_sources": [
+    "fully geometry-matched BF16/H100 native decoder GPU stage data",
+    "signed Q4K4 GPU prefix score timing for S1",
+    "SRAM bank port/links/controller physical traces",
+    "CIM signed accumulators and external programming/source-verified performance",
+    "GPU RoPE/SwiGLU/RMSNorm/LM-head/sampling exact stage profiles"
+  ],
+  "native_macro_ideal_reference_executed": "results/native_sinangil_arithmetic_receipt.json",
+  "original_axes": {
+    "prefix_tokens": [
+      1024,
+      2048,
+      4096,
+      8192,
+      16384
+    ],
+    "suffix_tokens": [
+      128,
+      256
+    ]
+  },
+  "original_coordinate_count": 10,
+  "original_coordinates": [
+    {
+      "Lp": 1024,
+      "Lu": 128,
+      "full_residency_macro_area_mm2": 209.7152,
+      "native_macro_calls_per_token": 524288,
+      "score_transfer_bytes_per_token": 4194304,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 1024,
+      "Lu": 256,
+      "full_residency_macro_area_mm2": 209.7152,
+      "native_macro_calls_per_token": 524288,
+      "score_transfer_bytes_per_token": 4194304,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 2048,
+      "Lu": 128,
+      "full_residency_macro_area_mm2": 419.4304,
+      "native_macro_calls_per_token": 1048576,
+      "score_transfer_bytes_per_token": 8388608,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 2048,
+      "Lu": 256,
+      "full_residency_macro_area_mm2": 419.4304,
+      "native_macro_calls_per_token": 1048576,
+      "score_transfer_bytes_per_token": 8388608,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 4096,
+      "Lu": 128,
+      "full_residency_macro_area_mm2": 838.8608,
+      "native_macro_calls_per_token": 2097152,
+      "score_transfer_bytes_per_token": 16777216,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 4096,
+      "Lu": 256,
+      "full_residency_macro_area_mm2": 838.8608,
+      "native_macro_calls_per_token": 2097152,
+      "score_transfer_bytes_per_token": 16777216,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 8192,
+      "Lu": 128,
+      "full_residency_macro_area_mm2": 1677.7216,
+      "native_macro_calls_per_token": 4194304,
+      "score_transfer_bytes_per_token": 33554432,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 8192,
+      "Lu": 256,
+      "full_residency_macro_area_mm2": 1677.7216,
+      "native_macro_calls_per_token": 4194304,
+      "score_transfer_bytes_per_token": 33554432,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 16384,
+      "Lu": 128,
+      "full_residency_macro_area_mm2": 3355.4432,
+      "native_macro_calls_per_token": 8388608,
+      "score_transfer_bytes_per_token": 67108864,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    },
+    {
+      "Lp": 16384,
+      "Lu": 256,
+      "full_residency_macro_area_mm2": 3355.4432,
+      "native_macro_calls_per_token": 8388608,
+      "score_transfer_bytes_per_token": 67108864,
+      "source": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:docs/sram2llm/SCIENTIFIC_CONTRACT.md"
+    }
+  ],
+  "overlap_policy": "strictly serial; no overlap credited",
+  "physical_macro": "micsedlab-afk/shared_prefix_cim@a8a3f7238c471da2f3b7e6fe5647f8f25b8d84c4:inputs/sinangil7nm/target_descriptor.json",
+  "qualified_full_tpot_coordinates": 0,
+  "qualified_speedup_coordinates": 0,
+  "schema": "cim-shared-prefix-architecture-sweep/v1",
+  "source_axes": "original QK numerical intervention Lp/Lu, not original decode serving measurements",
+  "sram_macro": "Yokoyama et al., VLSI 2020, DOI:10.1109/VLSICircuits18222.2020.9162985; complete 512x512 7nm SRAM macro density 29.2 Mbit/mm2"
+}
