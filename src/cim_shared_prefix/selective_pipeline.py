@@ -180,62 +180,64 @@ def resident_pipeline(
     if max_groups < 1:
         return None
     q = w.batch * w.gqa_ratio
-    n_scores_per_group = 16 * q
-
-    waves: list[ResidentWave] = []
-    remaining = groups
-    while remaining:
-        take = min(remaining, max_groups)
-        scores = 16 * take * q
-        # Two independent K sign planes can run on their physical banks
-        # simultaneously; two query signs are sequential. Each query has
-        # two native accesses per pair in the best valid split mapping.
-        cycle = 2 * q
-        vals = scores * 4 * d_tiles
-        adds = scores * (4 * d_tiles - 1)
-        # Each ADC output is an O4 code, with four unsigned partial paths per
-        # 64-row depth tile. One wave of raw codes and completed 32-bit
-        # reconstructed scores must be storable while next wave is computed.
-        raw_bytes = ceil(vals * 4 / 8)
-        complete_bytes = scores * 4
-        waves.append(ResidentWave(
-            groups=take, native_cycles=cycle,
-            unsigned_compute_s=cycle * CIM_PUBLISHED_ACCESS_S,
-            signed_partial_scaling_s=vals / rates.partial_scalings_per_s,
-            signed_reduction_s=adds / rates.signed_reduction_adds_per_s,
-            completed_score_transfer_s=complete_bytes / rates.completed_score_Bps,
-            scores=scores, raw_adc_bytes=raw_bytes,
-            completed_score_bytes=complete_bytes,
-        ))
-        remaining -= take
-
     total_scores = w.batch * w.query_heads * w.prefix_tokens
-    if sum(x.scores for x in waves) != total_scores:
-        raise AssertionError("wave scores do not cover exactly one layer")
-    # Double buffering at source data and completed-word output boundaries.
-    # The separated scaling/reduction engines exchange full signed partials
-    # (up to FP32), not merely O4 raw ADC codes. Double-buffer all THREE
-    # resource boundaries; no invisible infinite register file is assumed.
-    max_intermediates = max(
-        x.raw_adc_bytes +
-        x.scores * 4 * d_tiles * 4 +
-        x.completed_score_bytes
-        for x in waves
-    )
-    stage_bytes = 2 * max_intermediates
-    storage_macros = ceil(stage_bytes * 8 / SRAM_7NM.capacity_bits)
-    buffer_area = storage_macros * SRAM_7NM.area_mm2
-    if buffer_area > operand_stage_support_mm2 + 1e-12:
-        return None
-
     qbytes = ceil(w.batch * w.query_heads * w.head_dim * 4 / 8)
     query_time = qbytes / rates.query_Bps
-    warm = query_time + _wave_dag(waves) + rates.controller_s_per_layer
-    serial = query_time + sum(
-        x.unsigned_compute_s + x.signed_partial_scaling_s +
-        x.signed_reduction_s + x.completed_score_transfer_s
-        for x in waves
-    )
+
+    # Optimize wave width over ALL physically admissible widths, including
+    # finite SRAM staging. A full port-width wave may exceed its available
+    # intermediate storage at larger batch sizes.
+    feasible = []
+    for width in range(1, max_groups + 1):
+        waves: list[ResidentWave] = []
+        remaining = groups
+        while remaining:
+            take = min(remaining, width)
+            scores = 16 * take * q
+            # Each tile requires Q+/Q- accesses on both physically separate
+            # K-sign banks; K+ and K- are simultaneous, Q signs sequential.
+            cycle = 2 * q
+            vals = scores * 4 * d_tiles
+            adds = scores * (4 * d_tiles - 1)
+            raw_bytes = ceil(vals * 4 / 8)
+            complete_bytes = scores * 4
+            waves.append(ResidentWave(
+                groups=take, native_cycles=cycle,
+                unsigned_compute_s=cycle * CIM_PUBLISHED_ACCESS_S,
+                signed_partial_scaling_s=vals / rates.partial_scalings_per_s,
+                signed_reduction_s=adds / rates.signed_reduction_adds_per_s,
+                completed_score_transfer_s=complete_bytes / rates.completed_score_Bps,
+                scores=scores, raw_adc_bytes=raw_bytes,
+                completed_score_bytes=complete_bytes,
+            ))
+            remaining -= take
+        if sum(x.scores for x in waves) != total_scores:
+            raise AssertionError("wave output coverage incomplete")
+
+        # Double-buffer full raw O4 digitized values, FP32 partials between
+        # scaling/reduction, and completed FP32 score words. Every storage
+        # allocation is rounded to whole published 7nm SRAM macro capacity.
+        max_intermediates = max(
+            x.raw_adc_bytes +
+            x.scores * 4 * d_tiles * 4 +
+            x.completed_score_bytes for x in waves
+        )
+        stage_bytes = 2 * max_intermediates
+        storage_macros = ceil(stage_bytes * 8 / SRAM_7NM.capacity_bits)
+        buffer_area = storage_macros * SRAM_7NM.area_mm2
+        if buffer_area > operand_stage_support_mm2 + 1e-12:
+            continue
+        warm = query_time + _wave_dag(waves) + rates.controller_s_per_layer
+        serial = query_time + sum(
+            x.unsigned_compute_s + x.signed_partial_scaling_s +
+            x.signed_reduction_s + x.completed_score_transfer_s for x in waves
+        ) + rates.controller_s_per_layer
+        feasible.append((warm, -width, width, tuple(waves),
+                         storage_macros, buffer_area, stage_bytes, serial))
+
+    if not feasible:
+        return None
+    warm, _negative_width, chosen_width, waves, storage_macros, buffer_area, stage_bytes, serial = min(feasible)
     # Positive and negative key-bank planes each occupy one complete 512B
     # macro image. Source supply precedes programming on the same first use.
     key_bytes = layer_macros * (CIM_7NM.capacity_bits // 8)
@@ -251,7 +253,7 @@ def resident_pipeline(
         stage_buffer_bytes=stage_bytes,
         stage_buffer_limit_mm2=operand_stage_support_mm2,
         active_macro_ports=ports,
-        groups_per_wave=max_groups,
+        groups_per_wave=chosen_width,
         waves=tuple(waves),
         query_delivery_s=query_time,
         warm_pipelined_s_per_layer=warm,
