@@ -1,0 +1,60 @@
+name: Source-Verified KV Capacity and GPU Traffic Bounds
+on:
+  push:
+    branches: [research/verified-capacity-gpu-roofline-20261104, integration/final-framework]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integer-macro-bounds:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and test exact physical capacity and packing proofs
+        run: |
+          python -m compileall -q src/cim_shared_prefix/verified_residency_limits.py scripts/run_verified_capacity_study.py
+          python -m unittest discover -v -s tests -p test_verified_residency_limits.py
+      - name: Execute all source-derived capacity / cache / traffic coordinates
+        run: |
+          python scripts/run_verified_capacity_study.py \
+            --csv /tmp/source_7nm_kv_capacity_envelope.csv \
+            --rate-csv /tmp/source_fused_gpu_HBM_L2_required_rates.csv \
+            --crossmodel-csv /tmp/native_GQA_MHA_macro_capacity.csv \
+            --summary /tmp/source_7nm_kv_capacity_summary.json
+          python - <<'PY'
+          import csv,json
+          x=json.load(open('/tmp/source_7nm_kv_capacity_summary.json'))
+          assert x['case_count']==136
+          assert x['ideal_fused_GPU_rate_boundary_cases']==34
+          assert x['cross_native_model_geometry_count']==14
+          m=x['main_16mm2_P2048']
+          assert m['max_complete_layers_without_peripherals']==1
+          assert m['max_persistent_16token_layer_tiles_without_peripherals']==143
+          assert m['source_fp16_transformer_and_lm_head_weight_bytes']==15009316864
+          assert abs(m['optimistic_fraction_of_full_decoder_HBM_bytes_removed']-0.0006134179821551132)<1e-15
+          with open('/tmp/source_7nm_kv_capacity_envelope.csv', newline='') as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==136
+          assert all('conditional' not in r['evidence'] for r in rows)
+          h=x['source_ideal_fused_GPU_HBM_P2048_B1']
+          l=x['source_ideal_fused_GPU_L2_P2048_B1']
+          assert abs(h['necessary_local_V_read_bandwidth_Bps']-1.0195e12)<.1
+          assert abs(l['necessary_digital_PV_MAC_per_s']-7.2192e12)<.1
+          with open('/tmp/source_fused_gpu_HBM_L2_required_rates.csv') as f:
+              assert len(list(csv.DictReader(f)))==34
+          with open('/tmp/native_GQA_MHA_macro_capacity.csv') as f:
+              assert len(list(csv.DictReader(f)))==14
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: published-7nm-physical-capacity-and-GPU-source-byte-envelopes
+          path: |
+            /tmp/source_7nm_kv_capacity_envelope.csv
+            /tmp/source_fused_gpu_HBM_L2_required_rates.csv
+            /tmp/native_GQA_MHA_macro_capacity.csv
+            /tmp/source_7nm_kv_capacity_summary.json
+          if-no-files-found: error

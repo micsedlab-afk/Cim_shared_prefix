@@ -1,5 +1,8 @@
 # Final simulation results and reviewer-evidence response — 4 November 2026
 
+> **Evidence revision (4 Nov 2026).** Read [verified source-only capacity, fused GPU and B1 weight-traffic bounds](VERIFIED_CAPACITY_GPU_TRAFFIC_BOUNDS_20261104.md) and [reviewer addendum](REVIEWER_ADDENDUM_VERIFIED_CAPACITY_20261104.md) **before** interpreting the conditional 0.929 µs result below. That point depends on unverified 16TB/s V-SRAM bandwidth, 64TMAC/s digital PV and other nonphysical support-rate assumptions. The new rate-free study shows that 16mm² can permanently retain at most 143 of 4096 prefix token-layer tiles at P2048; in a source-modeled B1 FP16 all-HBM decoder, even free offload removes ≤0.061342% of the required weight+KV bytes per token. No demonstrated end-to-end speedup follows from the older favorable source comparisons.
+
+
 **Repository:** `micsedlab-afk/Cim_shared_prefix`  
 **Scope:** 7-nm published-macro architectural simulation of dense shared-prefix attention, native Llama-3.1-8B GQA; source-modeled A100 FP16 GPU comparator.  
 **Qualification:** `research/prefix-context-offload-20261104` has **156 discovered tests; 155 passed, one skipped** and the full **576-point** prefix-context study executed [in Actions run 41868345731](https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/41868345731). MAGMA source-native full QK–softmax–PV and grouped-QK execution [passed in run 41868354178](https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41868354178). All source-model results are simulation, not physical GPU timings.

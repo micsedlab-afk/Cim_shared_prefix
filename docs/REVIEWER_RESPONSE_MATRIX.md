@@ -1,5 +1,8 @@
 # Reviewer concern -> result -> qualification matrix (4 November 2026)
 
+> **Primary reviewer disposition (4 Nov 2026).** The authoritative source-only update is [REVIEWER_ADDENDUM_VERIFIED_CAPACITY_20261104.md](REVIEWER_ADDENDUM_VERIFIED_CAPACITY_20261104.md). The previous conditional 0.929µs operating point is **not** a physically demonstrated accelerator result. The macro-only occupancy and B1 FP16 full-decoder traffic ceilings now bound the system-scale opportunity under explicit memory-placement assumptions.
+
+
 **Authoritative detailed analysis:** [FINAL_RESULTS_AND_REVIEWER_MATRIX_20261104.md](FINAL_RESULTS_AND_REVIEWER_MATRIX_20261104.md). Existing literature comparisons and prior review framing are retained. The result is **published-macro-calibrated 7-nm simulation** with source-native A100 FP16 GQA modeling; no fabricated 7-nm integrated accelerator or real GPU kernel is asserted.
 
 | Existing reviewer issue | Direct result / remedy | Qualification |
