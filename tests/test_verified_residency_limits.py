@@ -14,6 +14,7 @@ from cim_shared_prefix.verified_residency_limits import (
     dense_llama_weight_parameters,fp16_decoder_weight_bytes,
     A100_L2_NOMINAL_BYTES,A100_80GB_SXM_HBM_BPS,
     fused_gpu_floor_and_requirements,A100_L2_MODEL_BPS,
+    cross_model_macro_bound,
 )
 
 
@@ -137,6 +138,34 @@ class PhysicalResidencyProofTests(unittest.TestCase):
             fused_gpu_floor_and_requirements(2048,1,16,"unknown")
         with self.assertRaises(ValueError):
             fused_gpu_floor_and_requirements(2048,0,16,"HBM")
+
+    def test_native_OPT_MHA_and_Mistral_GQA_SWA_source_geometry(self):
+        llama=cross_model_macro_bound(
+            "meta-llama/Llama-3.1-8B",2048,128,128,16)
+        mistral=cross_model_macro_bound(
+            "mistralai/Mistral-7B-v0.1",2048,128,128,16)
+        self.assertEqual(llama.attention_kind,"GQA")
+        self.assertEqual(mistral.attention_kind,"GQA")
+        self.assertEqual(llama.physical_K_macros_per_layer,4096)
+        self.assertEqual(mistral.physical_K_macros_per_layer,4096)
+        self.assertEqual(mistral.maximum_complete_layers_no_peripherals,1)
+        mistral_swa=cross_model_macro_bound(
+            "mistralai/Mistral-7B-v0.1",4096,128,128,16)
+        self.assertEqual(mistral_swa.first_decode_visible_prefix_tokens,3967)
+        self.assertEqual(mistral_swa.maximum_complete_layers_no_peripherals,0)
+        opt=cross_model_macro_bound("facebook/opt-2.7b",512,128,128,16)
+        self.assertEqual(opt.attention_kind,"MHA")
+        self.assertEqual(opt.kv_heads,32)
+        self.assertEqual(opt.head_dim,80)
+        self.assertEqual(opt.physical_K_macros_per_layer,4096)
+        self.assertEqual(opt.FP16_V_SRAM_macros_per_layer,80)
+        self.assertEqual(opt.maximum_complete_layers_no_peripherals,1)
+        opt1024=cross_model_macro_bound("facebook/opt-2.7b",1024,128,128,16)
+        self.assertEqual(opt1024.maximum_complete_layers_no_peripherals,0)
+        with self.assertRaisesRegex(ValueError,"context limit"):
+            cross_model_macro_bound("facebook/opt-2.7b",2048,128,128,16)
+        with self.assertRaisesRegex(ValueError,"unknown"):
+            cross_model_macro_bound("invalid",256,128,128,16)
 
     def test_no_setup_or_digital_area_implicitly_claimed(self):
         z=capacity_limit(2048,0.0)
