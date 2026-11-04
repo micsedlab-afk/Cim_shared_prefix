@@ -244,7 +244,8 @@ def simulate_prefix_context(
             total_area=fixed_area+buffer_area
             if total_area>area_mm2+1e-12:
                 continue
-            warm=(input_s+_blocking_pipeline(waves)+finalize_s+output_s+\n                  rates.controller_s_per_layer+external_setup_s_per_token)
+            warm=(input_s+_blocking_pipeline(waves)+finalize_s+output_s+
+                  rates.controller_s_per_layer+external_setup_s_per_token)
             # First token programs complete physical images of all K± and
             # FP16 V SRAM macros. No preloading is silently free.
             k_bytes=k_macros*(CIM_7NM.capacity_bits//8)
