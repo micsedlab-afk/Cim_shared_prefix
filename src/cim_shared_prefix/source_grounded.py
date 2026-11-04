@@ -438,3 +438,14 @@ def compare(w:Workload,physical:PhysicalCIM, *,gpu_points:tuple[GQAGPUPoint,...]
     base['missing_evidence']=sorted({name for pt in gpu_points for name in pt.missing})
     if rates.sram_write_Bps is None:base['missing_evidence'].append('physical SRAM-write service and explicit source')
     return base
+
+
+def s2_components_residency(workload: Workload, plan, rates,
+                            *, active_macro_ports: int | None = None):
+    """Source-grounded stages from the identical area/residency physical plan.
+
+    The legacy placement()/s2_components() use a distinct one-scratch macro
+    reference policy. Do not compare its timings with a multi-scratch plan.
+    """
+    from .integrated_schedule import serial_schedule
+    return serial_schedule(workload, plan, rates, active_macro_ports=active_macro_ports)

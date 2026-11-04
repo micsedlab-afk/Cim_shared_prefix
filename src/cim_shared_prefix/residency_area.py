@@ -460,3 +460,13 @@ def best_digital_requirement(workload: Workload, *, budget_mm2: float,
         return max(candidates, key=lambda item: (item[1].mac_core_area_mm2 or 0)
                    * (item[1].target_s - item[1].nonmac_s))
     return min(feasible, key=lambda item: item[1].required_mac_per_s_per_mm2)
+
+def integrated_serial_stages(workload: Workload, plan: Residency, rates,
+                             *, active_macro_ports: int | None = None):
+    """Common constructive physical schedule; preferred cross-workstream path.
+
+    The earlier cim_serial_stages is retained as its original optimistic
+    schedule and must not be compared with a different residency policy.
+    """
+    from .integrated_schedule import serial_schedule
+    return serial_schedule(workload, plan, rates, active_macro_ports=active_macro_ports)
