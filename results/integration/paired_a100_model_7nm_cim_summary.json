@@ -1,0 +1,68 @@
+{
+  "schema": "cim-shared-prefix-paired-a100-fp16-roofline-vs-7nm-cim-summary/v1",
+  "study_date": "2026-11-04",
+  "source_references": {
+    "gpu_runner_repo": "micsedlab-afk/MAGMA-gpt",
+    "gpu_runner_commit": "42b24f8b3c3842721544854ad93375ed952c0d76",
+    "gpu_execution": "https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41846791710",
+    "gpu_128step_input": "results/integration/source_native_a100_fp16_gqa_qk_128steps.json",
+    "paired_runner": "scripts/compare_native_a100_model_7nm.py",
+    "cim_128token_runner": "scripts/run_causal_7nm_sim.py",
+    "integration_tests": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/41847831215",
+    "integration_artifact": "paired-source-native-a100-gqa-fp16-vs-7nm-cim"
+  },
+  "workload": {
+    "model": "meta-llama/Llama-3.1-8B",
+    "batch": 1,
+    "prefix": 2048,
+    "suffix": 128,
+    "output_steps": 128,
+    "decoder_layers": 32,
+    "query_heads": 32,
+    "kv_heads": 8,
+    "head_dim": 128
+  },
+  "baseline": {
+    "device": "A100",
+    "device_evidence": "source-native LLMCompass A100_80GB_fp16 HBM2e",
+    "precision": "FP16",
+    "model_method": "BatchedMatmul source roofline, no launch overhead, no optimized Hydragen fusion",
+    "measured_hardware": false
+  },
+  "cim": {
+    "macro_source": "Sinangil JSSC 2021 reported fabricated 7nm unsigned I4W4O4 macro",
+    "macro_area_mm2": 0.0032,
+    "macro_access_s": 5.5e-9,
+    "macro_count": 4842,
+    "macro_area_instantiated_mm2": 15.4944,
+    "total_area_mm2_assumed": 16,
+    "external_area_mm2_assumed": 0.5,
+    "port_cap_assumed": 256,
+    "interface_throughput_Bps_assumed": 1000000000000,
+    "reduction_throughput_per_s_assumed": 1000000000000,
+    "qk_precision": "signed Q4K4 with O4 ADC response"
+  },
+  "source_model_numbers": {
+    "mean_a100_fp16_full_qk_us_per_layer": 1.1623658656204026,
+    "mean_a100_fp16_suffix_qk_us_per_layer": 0.1017047572339382,
+    "mean_a100_fp16_prefix_qk_saving_us_per_layer": 1.0606611083864643,
+    "mean_a100_fp16_prefix_qk_saving_us_all_layers": 33.94115546836686,
+    "mean_cim_necessary_floor_us_per_layer": 2.020269375,
+    "mean_cim_conditional_serial_us_per_layer": 6.058113,
+    "mean_cim_conditional_serial_us_per_generated_token": 193.859616,
+    "modeled_S2_minus_S0_attention_us_per_generated_token": 159.9184605316334,
+    "necessary_cim_floor_minus_a100_source_roofline_saving_us_per_generated_token": 30.70746453163314,
+    "paired_steps_executed": 128,
+    "s0_full_tpot_s": null,
+    "s2_full_tpot_s": null,
+    "hardware_speedup": null
+  },
+  "interpretation": "For the fixed operator decomposition and specified conditional 7nm CIM serial rates, the source-native FP16 A100 roofline model estimates too little QK work saved to amortize Q4K4 CIM programming, execution, reduction and score transport. This is a modeled negative result, not a universal exclusion against an optimized measured GPU.",
+  "scope": [
+    "Comparing FP16 source GPU operator model with lower-precision Q4K4O4 CIM source model; numerical quality differs.",
+    "GPU full attention post-QK softmax/PV and other decoder stages canceled by assumption; score recombination is set to zero (favors CIM).",
+    "Source model roofline difference is neither measured A100 runtime nor a mathematical upper bound on GPU QK savings.",
+    "CIM periphery area, ports and interface rates are explicit conditional sensitivities; no fabricated integrated 7nm accelerator.",
+    "No full decoder TPOT or speedup asserted."
+  ]
+}
