@@ -189,9 +189,10 @@ def resident_pipeline(
     # K is persistently resident; reusing it for each microbatch requires
     # no reprogramming. All B queries are serviced exactly once. Smaller
     # microbatches reduce the buffer demand without inventing extra ports.
-    # Include all divisors of B, since incomplete last batches cannot improve
-    # worst-case staging or per-wave compute in this homogeneous source model.
-    chunk_candidates=[chunk for chunk in range(1,w.batch+1) if w.batch%chunk==0]
+    # Enumerate every integer microbatch size; the last may be shorter.
+    # This is exhaustive within the defined batch-major/contiguous-wave
+    # serial-policy family, without assuming divisor-sized partitions.
+    chunk_candidates=range(1,w.batch+1)
     feasible = []
     for microbatch in chunk_candidates:
         for width in range(1,max_groups+1):
