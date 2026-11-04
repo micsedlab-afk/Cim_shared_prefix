@@ -259,3 +259,75 @@ def fused_gpu_floor_and_requirements(prefix_tokens:int,batch:int,
         maximum_area_left_after_KV_macros_mm2=max(0.0,remaining),
         necessary_PV_MAC_density_per_s_per_mm2=density,
     )
+
+
+@dataclass(frozen=True)
+class CrossModelMacroBound:
+    """Native physical geometry only; no generated OPT/Mistral numerical claims."""
+    model_id: str
+    model_revision: str
+    attention_kind: str
+    original_prefix_tokens: int
+    first_decode_visible_prefix_tokens: int
+    layers: int
+    query_heads: int
+    kv_heads: int
+    head_dim: int
+    physical_K_macros_per_layer: int
+    FP16_V_SRAM_macros_per_layer: int
+    physical_K_plus_V_area_mm2_per_layer: float
+    area_budget_mm2: float
+    maximum_complete_layers_no_peripherals: int
+    model_FP16_visible_prefix_KV_bytes_all_layers: int
+    evidence: str = "native_source_geometry_plus_complete_7nm_macro_capacity_only"
+
+    def json_record(self)->dict:
+        return asdict(self)
+
+
+def cross_model_macro_bound(model_id:str,prefix_tokens:int,
+                            suffix_tokens:int,output_tokens:int,
+                            area_budget_mm2:float)->CrossModelMacroBound:
+    """Native GQA/MHA and Mistral sliding-window visibility, no hardware rates.
+
+    For Mistral, use the largest visible prefix length at token 0; later
+    output-token evictions can only reduce required persistent K/V storage.
+    This is a first-token full-visible-prefix scenario, NOT a proof that
+    the same visible window remains useful during all O tokens.
+    """
+    from .profiles import visible_prefix
+
+    profile=next((p for p in PROFILES if p.model_id==model_id),None)
+    if profile is None:
+        raise ValueError("unknown pinned native model")
+    if (type(prefix_tokens) is not int or prefix_tokens<1 or
+        type(suffix_tokens) is not int or suffix_tokens<0 or
+        type(output_tokens) is not int or output_tokens<1):
+        raise ValueError("invalid context")
+    if prefix_tokens+suffix_tokens+output_tokens>profile.context_limit:
+        raise ValueError("native context limit exceeded")
+    _finite_nonnegative(area_budget_mm2,"area")
+    p=visible_prefix(profile,prefix_tokens,suffix_tokens,0)
+    # If all visible prefix has been evicted, no meaningful KV macro
+    # layer can be resident for this request at this time.
+    tiles=ceil(p/16)
+    k_macros=profile.kv_heads*ceil(profile.head_dim/64)*2*tiles
+    v_bytes=profile.kv_heads*p*profile.head_dim*FP16_BYTES
+    v_macros=ceil(v_bytes/(SRAM_7NM.capacity_bits//8))
+    area=k_macros*CIM_7NM.area_mm2+v_macros*SRAM_7NM.area_mm2
+    maximum=(min(profile.layers,floor((area_budget_mm2+1e-12)/area))
+             if area>0 else 0)
+    return CrossModelMacroBound(
+        model_id=profile.model_id,model_revision=profile.revision,
+        attention_kind=("MHA" if profile.gqa_ratio==1 else "GQA"),
+        original_prefix_tokens=prefix_tokens,
+        first_decode_visible_prefix_tokens=p,
+        layers=profile.layers,query_heads=profile.query_heads,
+        kv_heads=profile.kv_heads,head_dim=profile.head_dim,
+        physical_K_macros_per_layer=k_macros,
+        FP16_V_SRAM_macros_per_layer=v_macros,
+        physical_K_plus_V_area_mm2_per_layer=area,
+        area_budget_mm2=area_budget_mm2,
+        maximum_complete_layers_no_peripherals=maximum,
+        model_FP16_visible_prefix_KV_bytes_all_layers=profile.layers*v_bytes*2,
+    )
