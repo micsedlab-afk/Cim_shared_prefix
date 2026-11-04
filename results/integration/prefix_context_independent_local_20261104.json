@@ -1,6 +1,6 @@
 {
   "schema": "cim-7nm-prefix-context-local-independent-study-20261104/v1",
-  "status": "INDEPENDENT_CPU_ALGEBRAIC_SIMULATION__GITHUB_SOURCE_CI_PENDING",
+  "status": "INDEPENDENT_72_CASES_EXECUTED__SOURCE_576_CASES_CI_SUCCESS",
   "scientific_scope": "published 7nm Sinangil signed Q4K4 positive_negative_split + separately published 7nm Yokoyama FP16 V SRAM + assumed digital online softmax/PV",
   "model": "Llama-3.1-8B GQA, B1, P2048, suffix128, O128, 32 heads/8 KV/128 d, one resident layer",
   "provenance": {
@@ -91,7 +91,7 @@
   },
   "verification": [
     "Independent local Python reimplementation executes exact K/V macro area, cold-start and stage FIFO scheduling arithmetic.",
-    "Online stable softmax and GPU suffix LSE fusion functional tests are implemented in new feature branch but GitHub CI is queued as of 2026-11-04.",
+    "Online softmax and prefix/suffix fusion regression passed as part of the full 156-discovered-test GitHub source CI, one optional test skipped.",
     "GPU source model FP16 Matmul.roofline_model counts IO elements but divides by bytes/s, a factor-2 memory-term undercount; source corrected separately without overwriting raw evidence.",
     "The larger prefix context endpoint is numerically meaningful only after matching ADC digitized-score response; preserving FP16 V avoids new V quantization."
   ],
@@ -102,5 +102,20 @@
     "Rate model reuses full V SRAM per microbatch; GQA multicast within each batch group.",
     "Only a single pinned layer can fit at selected geometry; prefix context output for 31 other layers is unchanged GPU work.",
     "Potential performance benefits are isolated prefix-context service, not full-decoder TPOT or energy."
-  ]
+  ],
+  "qualification": {
+    "source_cim_ci": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/41868345731",
+    "tests_discovered": 156,
+    "tests_passed": 155,
+    "tests_skipped": 1,
+    "source_cim_sweep_rows": 576,
+    "source_cim_sweep_counts": {
+      "model_below_corrected_HBM_GPU_QK_proxy": 92,
+      "model_below_corrected_HBM_GPU_unfused_full_prefix_only": 244,
+      "model_not_below_corrected_HBM_GPU_unfused_full_prefix": 240
+    },
+    "source_magma_ci": "https://github.com/micsedlab-afk/MAGMA-gpt/actions/runs/41868354178",
+    "native_magma_six_batch_QK_softmax_PV": "SUCCESS",
+    "supported": "source-anchored conditional simulations; not CUDA-measured or fabricated integrated CIM"
+  }
 }
