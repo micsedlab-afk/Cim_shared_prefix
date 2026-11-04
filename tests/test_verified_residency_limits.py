@@ -1,0 +1,118 @@
+"""Independent integer macro/tile, cache pressure and weight-traffic checks."""
+from __future__ import annotations
+
+from itertools import product
+from math import floor, isclose
+from pathlib import Path
+import sys
+import unittest
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
+
+from cim_shared_prefix.area_optimizer import CIM_7NM,SRAM_7NM
+from cim_shared_prefix.verified_residency_limits import (
+    capacity_limit,minimum_touched_layers_for_persistent_tiles,
+    dense_llama_weight_parameters,fp16_decoder_weight_bytes,
+    A100_L2_NOMINAL_BYTES,A100_80GB_SXM_HBM_BPS,
+)
+
+
+class PhysicalResidencyProofTests(unittest.TestCase):
+    def test_permanent_full_signed_k_and_v_storage(self):
+        r=capacity_limit(2048,16.0)
+        self.assertEqual(r.k_cim_macros_per_full_layer,4096)
+        self.assertEqual(r.v_sram_macros_per_full_layer,128)
+        self.assertAlmostEqual(r.k_cim_area_mm2_per_layer,13.1072,places=12)
+        self.assertAlmostEqual(r.v_sram_area_mm2_per_layer,
+                               128*SRAM_7NM.area_mm2,places=12)
+        self.assertAlmostEqual(r.complete_kv_macro_area_mm2_per_layer,
+                               14.256324383561644,places=10)
+        self.assertEqual(r.max_complete_layers_without_peripherals,1)
+        self.assertEqual(r.signed_k_and_v_macros_per_16token_tile,(32,1))
+        self.assertEqual(r.max_persistent_16token_layer_tiles_without_peripherals,143)
+        self.assertEqual(r.minimum_touched_layers_to_pack_maximum_tiles,2)
+        self.assertAlmostEqual(r.persistent_prefix_token_layer_fraction_ceiling,
+                               143/4096,places=15)
+        self.assertLessEqual(143*r.physical_area_per_16token_tile_mm2,16)
+        self.assertGreater(144*r.physical_area_per_16token_tile_mm2,16)
+        self.assertEqual(r.max_removed_gpu_KV_bytes_under_persistent_tile_residency,
+                         143*65536)
+        self.assertEqual(r.gpu_fp16_prefix_KV_bytes_per_layer,8388608)
+        self.assertEqual(r.gpu_fp16_prefix_KV_bytes_all_layers,268435456)
+        self.assertFalse(r.gpu_prefix_KV_fits_entirely_in_nominal_A100_L2)
+        self.assertEqual(r.score_return_bytes_per_layer,262144)
+        self.assertEqual(r.prefix_context_LSE_return_bytes_per_layer,8320)
+        self.assertAlmostEqual(r.context_vs_score_bytes_ratio,262144/8320,places=14)
+
+    def test_exact_native_weight_operands_and_all_HBM_byte_envelope(self):
+        p=dense_llama_weight_parameters()
+        self.assertEqual(p["Q_projection_per_layer"],4096*4096)
+        self.assertEqual(p["K_projection_per_layer"],4096*1024)
+        self.assertEqual(p["V_projection_per_layer"],4096*1024)
+        self.assertEqual(p["O_projection_per_layer"],4096*4096)
+        self.assertEqual(p["MLP_up_per_layer"],4096*14336)
+        self.assertEqual(p["LM_head_once_per_token"],4096*128256)
+        self.assertEqual(fp16_decoder_weight_bytes(),15009316864)
+        x=capacity_limit(2048,16)
+        self.assertEqual(x.ideal_weight_plus_KV_HBM_bytes_per_token,15277752320)
+        self.assertAlmostEqual(x.optimistic_fraction_of_full_decoder_HBM_bytes_removed,
+                               0.0006134179821551132,places=15)
+        self.assertAlmostEqual(x.traffic_only_ideal_speedup_ceiling,
+                               1.0006137944947355,places=13)
+        self.assertAlmostEqual(x.gpu_fp16_prefix_KV_bytes_per_layer/A100_80GB_SXM_HBM_BPS*1e6,
+                               4.114079450711134,places=12)
+
+    def test_capacity_context_length_cache_and_io_tradeoff(self):
+        samples={64:(32,True),128:(17,True),256:(8,True),
+                 320:(7,False),512:(4,False),
+                 1024:(2,False),2048:(1,False),2304:(0,False),
+                 4096:(0,False)}
+        for p,(maxlayers,fits) in samples.items():
+            r=capacity_limit(p,16)
+            self.assertEqual(r.max_complete_layers_without_peripherals,maxlayers)
+            self.assertEqual(r.gpu_prefix_KV_fits_entirely_in_nominal_A100_L2,fits)
+            self.assertLessEqual(r.max_persistent_16token_layer_tiles_without_peripherals
+                                 *r.physical_area_per_16token_tile_mm2,16+1e-10)
+            self.assertLessEqual(r.persistent_prefix_token_layer_fraction_ceiling,1)
+        self.assertLess(capacity_limit(64,16).context_vs_score_bytes_ratio,1)
+        self.assertGreater(capacity_limit(128,16).context_vs_score_bytes_ratio,1)
+        self.assertEqual(capacity_limit(4096,16).max_complete_layers_without_peripherals,0)
+        self.assertGreater(capacity_limit(4096,16).max_persistent_16token_layer_tiles_without_peripherals,0)
+
+    def test_exact_minimum_number_of_touched_layers_exhaustive_small(self):
+        for layers in (1,2,3,4):
+            for tiles_per_layer in (1,2,3):
+                for target in range(layers*tiles_per_layer+1):
+                    best=min(sum(n>0 for n in alloc)
+                             for alloc in product(range(tiles_per_layer+1),repeat=layers)
+                             if sum(alloc)==target)
+                    self.assertEqual(
+                        minimum_touched_layers_for_persistent_tiles(target,tiles_per_layer),
+                        best)
+
+    def test_no_setup_or_digital_area_implicitly_claimed(self):
+        z=capacity_limit(2048,0.0)
+        self.assertEqual(z.max_complete_layers_without_peripherals,0)
+        self.assertEqual(z.max_persistent_16token_layer_tiles_without_peripherals,0)
+        self.assertAlmostEqual(z.traffic_only_ideal_speedup_ceiling,1.0,places=15)
+        self.assertAlmostEqual(z.optimistic_fraction_of_full_decoder_HBM_bytes_removed,
+                               0.0,places=15)
+        with self.assertRaises(ValueError):
+            capacity_limit(2047,16)
+        with self.assertRaises(ValueError):
+            capacity_limit(2048,-1)
+        with self.assertRaises(ValueError):
+            minimum_touched_layers_for_persistent_tiles(1,0)
+
+    def test_monotonicity_without_scheduling_assumptions(self):
+        for p in (128,256,512,1024,2048,4096):
+            cases=[capacity_limit(p,area) for area in (1,2,4,8,16,32,64)]
+            self.assertEqual(
+                sorted(x.max_complete_layers_without_peripherals for x in cases),
+                [x.max_complete_layers_without_peripherals for x in cases])
+            self.assertEqual(
+                sorted(x.max_persistent_16token_layer_tiles_without_peripherals for x in cases),
+                [x.max_persistent_16token_layer_tiles_without_peripherals for x in cases])
+
+
+if __name__=="__main__":
+    unittest.main()
