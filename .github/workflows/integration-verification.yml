@@ -1,7 +1,7 @@
 name: GPU evidence and integrated regression
 on:
   push:
-    branches: [integration/final-framework]
+    branches: [integration/final-framework, implementation/causal-simulation-20261104]
     paths-ignore:
       - 'results/integration/**'
       - 'results/gpu/**'
@@ -40,3 +40,26 @@ jobs:
           assert a['measurements']==[]
           assert a['full_decoder_tpot_s'] is None
           PY
+
+      - name: Execute 128-token source-macro causal simulation
+        run: |
+          python scripts/run_causal_7nm_sim.py --model llama --prefix 2048 \
+            --suffix 128 --batch 1 --output-tokens 128 --area-mm2 16 \
+            --support-mm2 0.5 --ports 256 --sram \
+            --out /tmp/cim-causal-llama-2048-128.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/cim-causal-llama-2048-128.json'))
+          assert len(x['execution']['token_steps'])==128
+          assert x['execution']['cim_macro_count']==4842
+          assert x['execution']['cim_total_program_bytes']>0
+          assert x['execution']['s0_model_mean_tpot_s'] is None
+          assert x['execution']['s2_model_mean_tpot_s'] is None
+          assert x['execution']['cim_mean_prefix_score_s']>0
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: executed-causal-source-macro-timeline
+          path: /tmp/cim-causal-llama-2048-128.json
+          if-no-files-found: ignore
