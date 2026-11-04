@@ -98,9 +98,8 @@ def main(a):
     def mean(k):
         return sum(x[k] for x in pairs)/len(pairs)
     diff=mean("modeled_S2_minus_S0_attention_s")
-    floor_excess=physical.cim_mean_prefix_score_s / (
-        physical.cim_mean_prefix_score_s / threshold.source_macro_floor_s
-    ) - mean("gpu_source_roofline_prefix_QK_saving_s")
+    floor_excess=(threshold.source_macro_floor_s -
+                  mean("gpu_source_roofline_prefix_QK_saving_s"))
     out={
         "schema":SCHEMA,
         "status":"EXECUTED_SOURCE_ROOFLINE_VS_7NM_MACRO_SERIAL_MODEL",
