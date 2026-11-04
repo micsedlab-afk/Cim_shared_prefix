@@ -79,6 +79,28 @@ class PhysicalResidencyProofTests(unittest.TestCase):
         self.assertEqual(capacity_limit(4096,16).max_complete_layers_without_peripherals,0)
         self.assertGreater(capacity_limit(4096,16).max_persistent_16token_layer_tiles_without_peripherals,0)
 
+    def test_full_model_KV_capacity_and_external_score_reduction_are_disjoint(self):
+        # Any positive score-output reduction requires P>65, because
+        # B*Hq*P*4 > B*Hq*(D*2+4) iff P>65.
+        # In 16-token-aligned native mapping, the smallest such P is 80.
+        # At P64 all 32 layers fit in a 16mm2 macro-only budget, but the
+        # context+LSE output (8320B) exceeds QK-score output (8192B).
+        for prefix in range(16,4097,16):
+            r=capacity_limit(prefix,16)
+            if r.max_complete_layers_without_peripherals==32:
+                self.assertLessEqual(r.context_vs_score_bytes_ratio,1.0)
+            if r.context_vs_score_bytes_ratio>1:
+                self.assertLess(r.max_complete_layers_without_peripherals,32)
+        self.assertEqual(capacity_limit(64,16).max_complete_layers_without_peripherals,32)
+        self.assertEqual(capacity_limit(80,16).max_complete_layers_without_peripherals,28)
+
+    def test_removing_V_does_not_enable_two_complete_signed_K_layers_at_P2048(self):
+        r=capacity_limit(2048,16)
+        self.assertGreater(2*r.k_cim_area_mm2_per_layer,16)
+        self.assertGreater(2*r.complete_kv_macro_area_mm2_per_layer,16)
+        self.assertGreater(32*r.complete_kv_macro_area_mm2_per_layer,16*28)
+        self.assertEqual(r.max_complete_layers_without_peripherals,1)
+
     def test_exact_minimum_number_of_touched_layers_exhaustive_small(self):
         for layers in (1,2,3,4):
             for tiles_per_layer in (1,2,3):
