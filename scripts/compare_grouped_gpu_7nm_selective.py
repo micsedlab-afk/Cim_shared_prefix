@@ -73,6 +73,7 @@ def execute(path:Path, csv_out:Path, json_out:Path, *,
             "selected_layers":chosen,
             "modeled_hybrid_minus_GPU_us_per_token":chosen*(mean_cost-source_gpu)*1e6,
             "wave_group_size":c.groups_per_wave,
+            "selected_microbatch_size":c.microbatch_size,
             "waves":len(c.waves),
             "buffer_area_mm2":c.physical_stage_buffer_area_mm2,
             "setup_margin_us_per_token":(source_gpu -
