@@ -113,18 +113,26 @@ def _wave_dag(waves: Sequence[ResidentWave]) -> float:
     stage has released wave k-1, whichever happens later. The 2-wave
     intermediate storage charged elsewhere permits the schedule.
     """
-    ready = [0.0, 0.0, 0.0, 0.0]
-    for wave in waves:
+    start = [[], [], [], []]
+    finish = [[], [], [], []]
+    for j, wave in enumerate(waves):
         durations = (wave.unsigned_compute_s,
                      wave.signed_partial_scaling_s,
                      wave.signed_reduction_s,
                      wave.completed_score_transfer_s)
-        predecessor = 0.0
-        for k, duration in enumerate(durations):
-            end = max(predecessor, ready[k]) + duration
-            ready[k] = end
-            predecessor = end
-    return ready[-1]
+        for stage, duration in enumerate(durations):
+            prior_job = finish[stage][j - 1] if j else 0.0
+            prior_stage = finish[stage - 1][j] if stage else 0.0
+            begin = max(prior_job, prior_stage)
+            end = begin + duration
+            # Blocking-after-service: every adjacent producer/consumer pair
+            # has two physical complete-wave buffers. The producer cannot
+            # finish wave j while both slots are held by waves j-2,j-1.
+            if stage < 3 and j >= 2:
+                end = max(end, start[stage + 1][j - 2])
+            start[stage].append(begin)
+            finish[stage].append(end)
+    return finish[-1][-1] if waves else 0.0
 
 
 def resident_pipeline(
@@ -205,7 +213,15 @@ def resident_pipeline(
     if sum(x.scores for x in waves) != total_scores:
         raise AssertionError("wave scores do not cover exactly one layer")
     # Double buffering at source data and completed-word output boundaries.
-    max_intermediates = max(x.raw_adc_bytes + x.completed_score_bytes for x in waves)
+    # The separated scaling/reduction engines exchange full signed partials
+    # (up to FP32), not merely O4 raw ADC codes. Double-buffer all THREE
+    # resource boundaries; no invisible infinite register file is assumed.
+    max_intermediates = max(
+        x.raw_adc_bytes +
+        x.scores * 4 * d_tiles * 4 +
+        x.completed_score_bytes
+        for x in waves
+    )
     stage_bytes = 2 * max_intermediates
     storage_macros = ceil(stage_bytes * 8 / SRAM_7NM.capacity_bits)
     buffer_area = storage_macros * SRAM_7NM.area_mm2
@@ -214,7 +230,7 @@ def resident_pipeline(
 
     qbytes = ceil(w.batch * w.query_heads * w.head_dim * 4 / 8)
     query_time = qbytes / rates.query_Bps
-    warm = query_time + _wave_dag(waves)
+    warm = query_time + _wave_dag(waves) + rates.controller_s_per_layer
     serial = query_time + sum(
         x.unsigned_compute_s + x.signed_partial_scaling_s +
         x.signed_reduction_s + x.completed_score_transfer_s
@@ -225,7 +241,7 @@ def resident_pipeline(
     key_bytes = layer_macros * (CIM_7NM.capacity_bits // 8)
     cold = (key_bytes/rates.prefix_supply_Bps +
             key_bytes/rates.programming_Bps +
-            rates.controller_s_per_layer)
+            0.0)
     return ResidentPipeline(
         macro_count_one_layer=layer_macros,
         macro_area_one_layer_mm2=macro_area,
