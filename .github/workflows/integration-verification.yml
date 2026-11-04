@@ -1,7 +1,7 @@
 name: GPU evidence and integrated regression
 on:
   push:
-    branches: [integration/final-framework, research/selective-pipelined-offload-20261104]
+    branches: [integration/final-framework]
     paths-ignore:
       - 'results/integration/**'
       - 'results/gpu/**'
