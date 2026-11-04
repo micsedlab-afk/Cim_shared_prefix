@@ -1,0 +1,641 @@
+{
+  "schema": "integrated_conditional_physical_envelope/v1",
+  "rows": 2304,
+  "per_model": {
+    "meta-llama/Llama-3.1-8B": 768,
+    "mistralai/Mistral-7B-v0.1": 768,
+    "facebook/opt-2.7b": 768
+  },
+  "budgets_mm2": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "physical_ports_cap_sensitivity": 256,
+  "bandwidths_Bps_sensitivity": [
+    100000000000.0,
+    1000000000000.0
+  ],
+  "external_support_mm2_sensitivity": [
+    0.0,
+    0.5
+  ],
+  "reported_macro": {
+    "source": "https://doi.org/10.1109/ISSCC19947.2020.9062985",
+    "area_mm2": 0.0032,
+    "signed_key_planes": 2,
+    "unsigned_evaluations": 4,
+    "native_access_s": 5.5e-09
+  },
+  "reported_sram": {
+    "source": "https://doi.org/10.1109/VLSICircuits18222.2020.9162985",
+    "area_mm2": 0.008977534246575342
+  },
+  "deadline_s": 0.002,
+  "deadline_qualification": "hypothetical parameter sensitivity, NOT a GPU timing",
+  "gpu_tpot_qualified_coordinates": 0,
+  "speedup_qualified_coordinates": 0,
+  "digital_isoarea_qualified_coordinates": 0,
+  "conditional_excluded_coordinates": 128,
+  "conditional_serial_achievable_coordinates": 1792,
+  "illustrative_conditional_points": [
+    {
+      "model": "meta-llama/Llama-3.1-8B",
+      "budget_mm2": 1,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 156,
+      "pinned_layers": 0,
+      "scratch_tile_units": 78,
+      "resource_floor_ms": 0.067029616,
+      "conditional_serial_ms": 0.212145152,
+      "minimum_common_interface_TBps_for_2ms": 0.07390308070949674,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.038015999999999994,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "meta-llama/Llama-3.1-8B",
+      "budget_mm2": 4,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 1092,
+      "pinned_layers": 0,
+      "scratch_tile_units": 546,
+      "resource_floor_ms": 0.06655362,
+      "conditional_serial_ms": 0.20088115199999998,
+      "minimum_common_interface_TBps_for_2ms": 0.07347438142046533,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.026751999999999998,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "meta-llama/Llama-3.1-8B",
+      "budget_mm2": 8,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 2342,
+      "pinned_layers": 0,
+      "scratch_tile_units": 1171,
+      "resource_floor_ms": 0.06591862000000001,
+      "conditional_serial_ms": 0.198065152,
+      "minimum_common_interface_TBps_for_2ms": 0.073367982601644,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.023936,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "meta-llama/Llama-3.1-8B",
+      "budget_mm2": 16,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 4842,
+      "pinned_layers": 1,
+      "scratch_tile_units": 373,
+      "resource_floor_ms": 0.06464862,
+      "conditional_serial_ms": 0.19385961599999998,
+      "minimum_common_interface_TBps_for_2ms": 0.0712263310709082,
+      "stage_ms": {
+        "source_key_supply": 0.065028096,
+        "macro_programming": 0.065028096,
+        "signed_unsigned_macro_evaluations": 0.023891999999999997,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "mistralai/Mistral-7B-v0.1",
+      "budget_mm2": 1,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 156,
+      "pinned_layers": 0,
+      "scratch_tile_units": 78,
+      "resource_floor_ms": 0.067029616,
+      "conditional_serial_ms": 0.212145152,
+      "minimum_common_interface_TBps_for_2ms": 0.07390308070949674,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.038015999999999994,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "mistralai/Mistral-7B-v0.1",
+      "budget_mm2": 4,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 1092,
+      "pinned_layers": 0,
+      "scratch_tile_units": 546,
+      "resource_floor_ms": 0.06655362,
+      "conditional_serial_ms": 0.20088115199999998,
+      "minimum_common_interface_TBps_for_2ms": 0.07347438142046533,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.026751999999999998,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "mistralai/Mistral-7B-v0.1",
+      "budget_mm2": 8,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 2342,
+      "pinned_layers": 0,
+      "scratch_tile_units": 1171,
+      "resource_floor_ms": 0.06591862000000001,
+      "conditional_serial_ms": 0.198065152,
+      "minimum_common_interface_TBps_for_2ms": 0.073367982601644,
+      "stage_ms": {
+        "source_key_supply": 0.067108864,
+        "macro_programming": 0.067108864,
+        "signed_unsigned_macro_evaluations": 0.023936,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "mistralai/Mistral-7B-v0.1",
+      "budget_mm2": 16,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 2048,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 4842,
+      "pinned_layers": 1,
+      "scratch_tile_units": 373,
+      "resource_floor_ms": 0.06464862,
+      "conditional_serial_ms": 0.19385961599999998,
+      "minimum_common_interface_TBps_for_2ms": 0.0712263310709082,
+      "stage_ms": {
+        "source_key_supply": 0.065028096,
+        "macro_programming": 0.065028096,
+        "signed_unsigned_macro_evaluations": 0.023891999999999997,
+        "query_delivery": 6.5536e-05,
+        "signed_partial_scaling": 0.016777216,
+        "signed_reduction": 0.014680064,
+        "completed_score_delivery": 0.008388608,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "facebook/opt-2.7b",
+      "budget_mm2": 1,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 512,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 156,
+      "pinned_layers": 0,
+      "scratch_tile_units": 78,
+      "resource_floor_ms": 0.041863792000000004,
+      "conditional_serial_ms": 0.103392512,
+      "minimum_common_interface_TBps_for_2ms": 0.043388892081054606,
+      "stage_ms": {
+        "source_key_supply": 0.04194304,
+        "macro_programming": 0.04194304,
+        "signed_unsigned_macro_evaluations": 0.009503999999999999,
+        "query_delivery": 4.096e-05,
+        "signed_partial_scaling": 0.004194304,
+        "signed_reduction": 0.003670016,
+        "completed_score_delivery": 0.002097152,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "facebook/opt-2.7b",
+      "budget_mm2": 4,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 512,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 1092,
+      "pinned_layers": 0,
+      "scratch_tile_units": 546,
+      "resource_floor_ms": 0.041387796,
+      "conditional_serial_ms": 0.100576512,
+      "minimum_common_interface_TBps_for_2ms": 0.04332735275099267,
+      "stage_ms": {
+        "source_key_supply": 0.04194304,
+        "macro_programming": 0.04194304,
+        "signed_unsigned_macro_evaluations": 0.0066879999999999995,
+        "query_delivery": 4.096e-05,
+        "signed_partial_scaling": 0.004194304,
+        "signed_reduction": 0.003670016,
+        "completed_score_delivery": 0.002097152,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "facebook/opt-2.7b",
+      "budget_mm2": 8,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 512,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 2342,
+      "pinned_layers": 0,
+      "scratch_tile_units": 1171,
+      "resource_floor_ms": 0.040752796,
+      "conditional_serial_ms": 0.09987251200000001,
+      "minimum_common_interface_TBps_for_2ms": 0.04331199518457724,
+      "stage_ms": {
+        "source_key_supply": 0.04194304,
+        "macro_programming": 0.04194304,
+        "signed_unsigned_macro_evaluations": 0.005984,
+        "query_delivery": 4.096e-05,
+        "signed_partial_scaling": 0.004194304,
+        "signed_reduction": 0.003670016,
+        "completed_score_delivery": 0.002097152,
+        "controller": 0.0
+      }
+    },
+    {
+      "model": "facebook/opt-2.7b",
+      "budget_mm2": 16,
+      "support_mm2_sensitivity": 0.5,
+      "prefix_tokens": 512,
+      "batch": 1,
+      "output_tokens": 128,
+      "bandwidth_Bps_sensitivity": 1000000000000.0,
+      "macro_count": 4842,
+      "pinned_layers": 1,
+      "scratch_tile_units": 373,
+      "resource_floor_ms": 0.039482796,
+      "conditional_serial_ms": 0.09726055200000001,
+      "minimum_common_interface_TBps_for_2ms": 0.04200221504514424,
+      "stage_ms": {
+        "source_key_supply": 0.04064256,
+        "macro_programming": 0.04064256,
+        "signed_unsigned_macro_evaluations": 0.005972999999999999,
+        "query_delivery": 4.096e-05,
+        "signed_partial_scaling": 0.004194304,
+        "signed_reduction": 0.003670016,
+        "completed_score_delivery": 0.002097152,
+        "controller": 0.0
+      }
+    }
+  ],
+  "end_to_end_decoder_status": "unqualified: Hydragen-style GPU full attention and remaining operators missing",
+  "SWA": "Mistral each position uses causally visible prefix; changing window uses cold per-token constructive schedules; necessary bound omits recurring programming",
+  "opt_limit": "prefix+suffix+generated tokens <= 2048",
+  "quality": {
+    "evaluated_Llama_units": 96,
+    "Llama_R0_R3": [
+      {
+        "prefix": 512,
+        "arm": "R0",
+        "nll": 1.9019525185482418,
+        "ppl": 6.698961527901596,
+        "nll_ci95": [
+          1.6215949462738946,
+          2.1845997421650805
+        ]
+      },
+      {
+        "prefix": 512,
+        "arm": "R1",
+        "nll": 1.9052995561552555,
+        "ppl": 6.721420769058875,
+        "nll_ci95": [
+          1.627565420786948,
+          2.184939039626802
+        ]
+      },
+      {
+        "prefix": 512,
+        "arm": "R2",
+        "nll": 1.9166643761365392,
+        "ppl": 6.798244221602844,
+        "nll_ci95": [
+          1.6363380801026557,
+          2.1985132921345194
+        ]
+      },
+      {
+        "prefix": 512,
+        "arm": "R3",
+        "nll": 1.9228534757047029,
+        "ppl": 6.840449704222999,
+        "nll_ci95": [
+          1.6401489162008316,
+          2.195404125397478
+        ]
+      },
+      {
+        "prefix": 2048,
+        "arm": "R0",
+        "nll": 1.7012436405992344,
+        "ppl": 5.4807592498153035,
+        "nll_ci95": [
+          1.4199828405011967,
+          1.9866189667353282
+        ]
+      },
+      {
+        "prefix": 2048,
+        "arm": "R1",
+        "nll": 1.7162975321086327,
+        "ppl": 5.5638901568601975,
+        "nll_ci95": [
+          1.436473750068743,
+          1.9981940290984332
+        ]
+      },
+      {
+        "prefix": 2048,
+        "arm": "R2",
+        "nll": 1.748031846370517,
+        "ppl": 5.743287872151298,
+        "nll_ci95": [
+          1.473260182755812,
+          2.0292652497333785
+        ]
+      },
+      {
+        "prefix": 2048,
+        "arm": "R3",
+        "nll": 1.734458438225615,
+        "ppl": 5.665858560372165,
+        "nll_ci95": [
+          1.4671802845128648,
+          1.998466235605148
+        ]
+      },
+      {
+        "prefix": 16384,
+        "arm": "R0",
+        "nll": 1.6397976926797286,
+        "ppl": 5.15412668919404,
+        "nll_ci95": [
+          1.3381909520661313,
+          1.9496666195725862
+        ]
+      },
+      {
+        "prefix": 16384,
+        "arm": "R1",
+        "nll": 1.6594442185954208,
+        "ppl": 5.256388629410263,
+        "nll_ci95": [
+          1.3558471435146322,
+          1.9723802865151372
+        ]
+      },
+      {
+        "prefix": 16384,
+        "arm": "R2",
+        "nll": 1.6909867077522123,
+        "ppl": 5.424830787805883,
+        "nll_ci95": [
+          1.3968622877960133,
+          2.001051770317679
+        ]
+      },
+      {
+        "prefix": 16384,
+        "arm": "R3",
+        "nll": 1.7020931232087104,
+        "ppl": 5.485417037559494,
+        "nll_ci95": [
+          1.4077978347785014,
+          2.005189915333562
+        ]
+      }
+    ],
+    "paired_effects": [
+      {
+        "prefix": 512,
+        "effect": "quantization",
+        "relative_ppl": 0.0033526451919055414,
+        "ci95": [
+          -0.006049502706888137,
+          0.013832262520315258
+        ]
+      },
+      {
+        "prefix": 512,
+        "effect": "macro",
+        "relative_ppl": 0.011429644889606476,
+        "ci95": [
+          0.0062493327922353474,
+          0.016473969979395688
+        ]
+      },
+      {
+        "prefix": 512,
+        "effect": "circuit",
+        "relative_ppl": 0.00620829161830312,
+        "ci95": [
+          -0.0064412678045166535,
+          0.018543984703403852
+        ]
+      },
+      {
+        "prefix": 512,
+        "effect": "hardware_only",
+        "relative_ppl": 0.017708895076477882,
+        "ci95": [
+          0.00425496594544672,
+          0.03187340686021223
+        ]
+      },
+      {
+        "prefix": 512,
+        "effect": "total",
+        "relative_ppl": 0.021120911910315576,
+        "ci95": [
+          0.004623929164896176,
+          0.035900686045945845
+        ]
+      },
+      {
+        "prefix": 2048,
+        "effect": "quantization",
+        "relative_ppl": 0.01516777206510128,
+        "ci95": [
+          0.008116274139296161,
+          0.024056842307079194
+        ]
+      },
+      {
+        "prefix": 2048,
+        "effect": "macro",
+        "relative_ppl": 0.03224321656852014,
+        "ci95": [
+          0.023466162153373465,
+          0.04014697116911008
+        ]
+      },
+      {
+        "prefix": 2048,
+        "effect": "circuit",
+        "relative_ppl": -0.013481704818346572,
+        "ci95": [
+          -0.032944593946455145,
+          0.006630852782298774
+        ]
+      },
+      {
+        "prefix": 2048,
+        "effect": "hardware_only",
+        "relative_ppl": 0.01832681822200266,
+        "ci95": [
+          0.0004975179238912997,
+          0.034895867600439154
+        ]
+      },
+      {
+        "prefix": 2048,
+        "effect": "total",
+        "relative_ppl": 0.03377256728857392,
+        "ci95": [
+          0.009936308265834973,
+          0.05826068211817986
+        ]
+      },
+      {
+        "prefix": 16384,
+        "effect": "quantization",
+        "relative_ppl": 0.019840789018752945,
+        "ci95": [
+          0.006129609405195404,
+          0.03149959076987902
+        ]
+      },
+      {
+        "prefix": 16384,
+        "effect": "macro",
+        "relative_ppl": 0.032045225395466656,
+        "ci95": [
+          0.007732803780585866,
+          0.0546759785500833
+        ]
+      },
+      {
+        "prefix": 16384,
+        "effect": "circuit",
+        "relative_ppl": 0.011168320658000833,
+        "ci95": [
+          -0.0161545826495908,
+          0.03660485611037739
+        ]
+      },
+      {
+        "prefix": 16384,
+        "effect": "hardware_only",
+        "relative_ppl": 0.04357143740624192,
+        "ci95": [
+          0.006547682850569891,
+          0.07815257762059612
+        ]
+      },
+      {
+        "prefix": 16384,
+        "effect": "total",
+        "relative_ppl": 0.06427671812181597,
+        "ci95": [
+          0.031124175477396956,
+          0.09389094220231681
+        ]
+      }
+    ],
+    "other_models": {
+      "mistralai/Mistral-7B-v0.1": {
+        "revision": "17688039ea7b7001c702797eed2ab7716a0cc3c2",
+        "status": "NUMERICAL_EVALUATION_PENDING",
+        "required_units": 96,
+        "evaluated_units": 0,
+        "model_specific_adc_calibrated": false,
+        "attention": "native GQA, 4096-token sliding window"
+      },
+      "facebook/opt-2.7b": {
+        "revision": "905a4b602cda5c501f1b3a2650a4152680238254",
+        "status": "NUMERICAL_EVALUATION_PENDING",
+        "required_units": 96,
+        "evaluated_units": 0,
+        "model_specific_adc_calibrated": false,
+        "attention": "native MHA, maximum position 2048, 80 active rows padded to 128"
+      }
+    },
+    "source": "results/quality/source_evidence.json"
+  },
+  "no_physical_implementation_or_GPU_speedup_claim": true
+}
