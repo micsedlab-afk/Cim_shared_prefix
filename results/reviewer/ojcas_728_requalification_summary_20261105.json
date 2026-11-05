@@ -131,5 +131,52 @@
     "8B compressed-prefix full model numerical quality",
     "chip/system energy"
   ],
-  "source": "Submitted OJCAS-2026-0120 tables/eqs and accepted signed macro mapping; actual executable integer-accounting audit."
+  "source": "Submitted OJCAS-2026-0120 tables/eqs and accepted signed macro mapping; actual executable integer-accounting audit.",
+  "resource_screen": {
+    "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42038065036",
+    "rate_sensitivity_Bps": 1000000000000,
+    "B1": {
+      "Aadd_mm2": 8,
+      "B": 1,
+      "Lp": 2048,
+      "full_execution_tpot_us": null,
+      "independent_resource_lower_floor_us_per_token_at_rate_sensitivity": 65.838864,
+      "largest_necessary_resource_at_rate_sensitivity": "physical_signed_macro_programming",
+      "one_completed_word_link_us_per_token_if_local_reduction_at_rate_sensitivity": 8.388608,
+      "optimistic_native_macro_resource_us_per_token": 2.4639999999999995,
+      "qualified_a100_INT4_speedup": null,
+      "signed_programming_mean_us_per_token_O128_at_rate_sensitivity": 65.838864,
+      "source_evidence": "signed native macros + exactly original 728 design grid; UNQUALIFIED 1TBps independent port caps",
+      "two_d64_partial_link_us_per_token_at_rate_sensitivity": 16.777216
+    },
+    "B4": {
+      "Aadd_mm2": 8,
+      "B": 4,
+      "Lp": 2048,
+      "full_execution_tpot_us": null,
+      "independent_resource_lower_floor_us_per_token_at_rate_sensitivity": 67.108864,
+      "largest_necessary_resource_at_rate_sensitivity": "paper_GPU_d64_half_partial_link",
+      "one_completed_word_link_us_per_token_if_local_reduction_at_rate_sensitivity": 33.554432,
+      "optimistic_native_macro_resource_us_per_token": 9.328,
+      "qualified_a100_INT4_speedup": null,
+      "signed_programming_mean_us_per_token_O128_at_rate_sensitivity": 65.838864,
+      "source_evidence": "signed native macros + exactly original 728 design grid; UNQUALIFIED 1TBps independent port caps",
+      "two_d64_partial_link_us_per_token_at_rate_sensitivity": 67.108864
+    },
+    "B128": {
+      "Aadd_mm2": 8,
+      "B": 128,
+      "Lp": 2048,
+      "full_execution_tpot_us": null,
+      "independent_resource_lower_floor_us_per_token_at_rate_sensitivity": 2147.483648,
+      "largest_necessary_resource_at_rate_sensitivity": "paper_GPU_d64_half_partial_link",
+      "one_completed_word_link_us_per_token_if_local_reduction_at_rate_sensitivity": 1073.741824,
+      "optimistic_native_macro_resource_us_per_token": 295.328,
+      "qualified_a100_INT4_speedup": null,
+      "signed_programming_mean_us_per_token_O128_at_rate_sensitivity": 65.838864,
+      "source_evidence": "signed native macros + exactly original 728 design grid; UNQUALIFIED 1TBps independent port caps",
+      "two_d64_partial_link_us_per_token_at_rate_sensitivity": 2147.483648
+    },
+    "qualified_GPU_baseline": false
+  }
 }
