@@ -17,7 +17,7 @@ jobs:
       - name: Validate the original paper and new stage-delta gates
         run: |
           python -m compileall -q src/cim_shared_prefix/ojcas_published_placement_delta.py scripts/run_ojcas_published_placement_delta.py
-          python -m unittest -v tests.test_ojcas_manuscript_baseline tests.test_ojcas_placement_extension tests.test_ojcas_review_scope tests.test_ojcas_published_placement_delta
+          python -m unittest -v tests.test_ojcas_manuscript_baseline tests.test_ojcas_placement_extension tests.test_ojcas_review_scope tests.test_ojcas_published_placement_delta tests.test_ojcas_output_reuse_sweep
       - name: Compute 728 S2 K4 source, programming and native macro stage deltas
         run: |
           python scripts/run_ojcas_published_placement_delta.py --out-dir /tmp/ojcas_source_728
@@ -35,7 +35,26 @@ jobs:
           assert d['native_CIM_access_ns']==5.5
           assert d['programming_64row_wave_ns'] == 12.8
           assert d['experimental_class'].startswith('executed paper-source')
+          assert d['by_area']['16']['source_serial_positive_delta_cases']==39
+          assert sum(v['source_serial_positive_delta_cases'] for v in d['by_area'].values())==117
+          assert sum(v['parameter_free_no_compute_wave_penalty_cases'] for v in d['by_area'].values())==117
+          assert all(r['full_decoder_tpot_us']=='' for r in rows)
           assert all(r['original_engine_macros']=='128' and not r['original_s2_model_historical_stage_speedup'] for r in rows)
+          PY
+      - name: Generalize to O1 O32 O128 O512 and 1 or 8 prefix-reuse cohorts
+        run: |
+          python scripts/run_ojcas_output_reuse_sweep.py --out-dir /tmp/ojcas_source_728
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          p=Path('/tmp/ojcas_source_728')
+          m=json.loads((p/'ojcas_original_S2_output_reuse_5824.json').read_text())
+          with (p/'ojcas_original_S2_output_reuse_5824.csv').open() as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==5824
+          assert m['historical_paper_results_preserved']
+          assert next(s for s in m['sections'] if s['O']==1 and s['reuse_batches']==1)['positive_coordinates']==0
+          assert next(s for s in m['sections'] if s['O']==128 and s['reuse_batches']==1)['positive_coordinates']==117
           PY
       - uses: actions/upload-artifact@v4
         with:
