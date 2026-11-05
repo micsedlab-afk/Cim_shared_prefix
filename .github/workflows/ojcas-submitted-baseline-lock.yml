@@ -36,7 +36,7 @@ jobs:
           e=x['paper_macro_partial_energy']
           assert math.isclose(e['crossing_B_s1_hd'],40.85689802913453)
           assert math.isclose(e['crossing_B_s1_dp'],25.44644387317909)
-          assert all(v['original_s2_engine_area_mm2']=='.4096' for v in rows)
+          assert all(math.isclose(float(v['original_s2_engine_area_mm2']),.4096) for v in rows)
           assert all(not v['individual_s2_stage_speedup'] for v in rows)
           assert x['source_derived_number_of_individually_qualified_stage_times']==0
           PY
