@@ -1,0 +1,56 @@
+name: Real Pretrained Prefix-CIM Safety Admission
+on:
+  push:
+    branches: [research/prefix-summary-cim-20261105]
+    paths:
+      - 'scripts/evaluate_prefix_safe_dispatch.py'
+      - 'scripts/evaluate_pretrained_compact_prefix.py'
+      - 'src/cim_shared_prefix/compact_prefix_cim.py'
+      - '.github/workflows/pretrained-safe-dispatch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-model-conditional-exact-GPU:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'numpy==1.26.4' 'transformers==4.46.3' 'safetensors>=0.4,<0.6' 'huggingface_hub>=0.26,<0.32'
+          python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+      - name: Execute pretrained nonrepeating passages with calibrated selective CIM and exact GPU fallback
+        run: |
+          python scripts/evaluate_prefix_safe_dispatch.py \
+            --prefix 128 --output 32 --centroids 64 --max-delta-nll 0.1 --threads 4 \
+            --out /tmp/smol_real_gqa_gpu_fallback_NLL.json \
+            --csv /tmp/smol_real_gqa_per_layer_safety.csv
+          python - <<'PY'
+          import json, math
+          r=json.load(open('/tmp/smol_real_gqa_gpu_fallback_NLL.json'))
+          assert r['pretrained_all_weights']
+          assert len(r['single_layer_calibration_delta_NLL'])==30
+          assert len(r['heldout'])==2
+          assert r['next_token_targets_per_passage']==31
+          assert r['admitted_count']>=0
+          assert all(math.isfinite(x['delta_NLL']) for x in r['heldout'])
+          if r['selected_macro_storage']:
+              assert r['selected_macro_storage']['signed_K_V_metadata_macro_area_mm2']<16
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pretrained-GQA-real-NLL-quality-gated-admission-and-2-heldout
+          path: |
+            /tmp/smol_real_gqa_gpu_fallback_NLL.json
+            /tmp/smol_real_gqa_per_layer_safety.csv
+          if-no-files-found: warn

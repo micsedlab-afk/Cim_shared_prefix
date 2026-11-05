@@ -1,0 +1,40 @@
+name: Compressed Shared Prefix 7nm CIM - Algorithmic Qualification
+on:
+  push:
+    branches: [research/prefix-summary-cim-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-numeric-and-physical-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install numpy
+      - name: Test true prefix attention and physical budgeted scheduling
+        run: |
+          python -m compileall -q src/cim_shared_prefix/compact_prefix_cim.py
+          PYTHONPATH=src python -m unittest -v tests.test_compact_prefix_cim
+      - name: Reconfirm complete 32-layer native Llama storage mapping
+        run: |
+          PYTHONPATH=src python - <<'PY'
+          import json
+          from cim_shared_prefix.compact_prefix_cim import macro_summary_area
+          z={str(m):macro_summary_area(32,8,128,m) for m in (16,32,64,128)}
+          assert z["64"]["signed_K_CIM_macros"]==4096
+          assert z["64"]["FP16_V_SRAM_macros"]==128
+          assert z["64"]["metadata_SRAM_macros"]==2
+          assert z["64"]["signed_K_V_metadata_macro_area_mm2"]<16
+          assert z["128"]["signed_K_V_metadata_macro_area_mm2"]>16
+          open("/tmp/compact_prefix_macro_area.json","w").write(json.dumps(z,indent=2))
+          print(json.dumps(z,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-macro-compact-prefix-capacity
+          path: /tmp/compact_prefix_macro_area.json
+          if-no-files-found: error

@@ -1,0 +1,59 @@
+name: Actual Pretrained GQA Compact Prefix Inference
+on:
+  push:
+    branches: [research/prefix-summary-cim-20261105]
+    paths:
+      - 'src/cim_shared_prefix/compact_prefix_cim.py'
+      - 'scripts/evaluate_pretrained_compact_prefix.py'
+      - '.github/workflows/pretrained-compact-prefix.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  teacher-forced-inference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned CPU pretrained inference dependencies
+        run: |
+          python -m pip install 'numpy==1.26.4' 'transformers==4.46.3' 'safetensors>=0.4,<0.6' 'huggingface_hub>=0.26,<0.32'
+          python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+          python - <<'PY'
+          import transformers,torch,numpy
+          print({'transformers':transformers.__version__,'torch':torch.__version__,'numpy':numpy.__version__})
+          PY
+      - name: Execute genuine pretrained real-weights attention quality and causal NLL
+        run: |
+          python scripts/evaluate_pretrained_compact_prefix.py \
+            --prefix 128 --output 8 --threads 4 \
+            --out /tmp/real_pretrained_compact_prefix_result.json \
+            --per-layer /tmp/real_pretrained_compact_prefix_layer_errors.csv
+          python - <<'PY'
+          import json,math
+          r=json.load(open('/tmp/real_pretrained_compact_prefix_result.json'))
+          assert r['actual_checkpoint_weights_used']
+          assert r['heldout_full_P_max_logit_abs_diff']<.025
+          assert abs(r['heldout_full_P_reconstruction_NLL']-r['heldout_exact_NLL'])<.002
+          assert math.isfinite(r['heldout_uniform_M64_delta_NLL'])
+          assert math.isfinite(r['heldout_allocated_delta_NLL'])
+          assert len(r['allocation']['per_layer_representatives'])==30
+          assert r['allocation']['macro_area_including_max_metadata_mm2']<=r['allocation']['budget_mm2']
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pretrained-smollm2-real-weight-compact-prefix-calibration-heldout-NLL
+          path: |
+            /tmp/real_pretrained_compact_prefix_result.json
+            /tmp/real_pretrained_compact_prefix_layer_errors.csv
+          if-no-files-found: warn

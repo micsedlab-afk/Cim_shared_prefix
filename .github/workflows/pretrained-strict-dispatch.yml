@@ -1,0 +1,55 @@
+name: Real GQA Conservative Exact-GPU Admission
+on:
+  push:
+    branches: [research/prefix-summary-cim-20261105]
+    paths:
+      - 'scripts/evaluate_prefix_strict_dispatch.py'
+      - 'scripts/evaluate_pretrained_compact_prefix.py'
+      - 'src/cim_shared_prefix/compact_prefix_cim.py'
+      - '.github/workflows/pretrained-strict-dispatch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true-heldout-CIM-admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install 'numpy==1.26.4' 'transformers==4.46.3' 'safetensors>=0.4,<0.6' 'huggingface_hub>=0.26,<0.32'
+          python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+      - name: Full 30-layer genuine GQA inference - strict two-domain admission plus heldout C
+        run: |
+          python scripts/evaluate_prefix_strict_dispatch.py \
+            --prefix 128 --output 32 --centroids 64 --max-delta-nll 0.05 --threads 4 \
+            --out /tmp/real_strict_CIM_GPU_heldout_NLL.json \
+            --csv /tmp/real_strict_CIM_GPU_calibrated_sensitivity.csv
+          python - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/real_strict_CIM_GPU_heldout_NLL.json'))
+          assert d['schema']=='source-pretrained-smollm2-135m-strict-nonincreasing-layer-admission/v1'
+          assert d['pretrained_all_weights']
+          assert d['admitted_count']<=d['isolated_nonincreasing_layer_count']
+          assert d['next_token_targets_per_passage']==31
+          assert math.isfinite(d['heldout_mean_delta_NLL'])
+          assert len(d['single_layer_calibration_A_delta_NLL'])==30
+          assert len(d['single_layer_calibration_B_delta_NLL'])==30
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pretrained-strict-non-degrading-dual-domain-CIM-admission
+          path: |
+            /tmp/real_strict_CIM_GPU_heldout_NLL.json
+            /tmp/real_strict_CIM_GPU_calibrated_sensitivity.csv
+          if-no-files-found: warn
