@@ -40,6 +40,7 @@ class A100CompressedPoint:
     full_compressed_fp16_KV_fits_nominal_A100_L2: bool
     hybrid_FP16_KV_fits_nominal_A100_L2: bool
     published_K_V_metadata_macro_area_mm2_if_all_layers: float
+    selected_layer_K_V_metadata_macro_only_area_mm2: float
     cim_macro_count_per_layer: int
     cim_signed_unsigned_array_work_per_layer: int
     cim_macro_only_optimistic_floor_us_per_layer: float
@@ -111,6 +112,8 @@ def point(batch: int = 1, prefix: int = 2048, reps: int = 64,
     # Q4 K is 4 bits; V is FP16; metadata holds uint16 count + FP16 scale.
     packed_per_layer=KV_HEADS*reps*D//2 + KV_HEADS*reps*D*2 + KV_HEADS*reps*4
     budget=macro_summary_area(L,KV_HEADS,D,reps)
+    selected_budget=(macro_summary_area(selected_layers,KV_HEADS,D,reps)
+                     if selected_layers else None)
     # This is the same native Q4xK4 K+/K- macro mapping already audited in
     # the main area/signed arithmetic workstream. A single layer is active.
     one_layer=Workload(batch,reps,128,QUERY_HEADS,KV_HEADS,D,1,1)
@@ -130,6 +133,9 @@ def point(batch: int = 1, prefix: int = 2048, reps: int = 64,
         hybrid_FP16_KV_fits_nominal_A100_L2=hybrid<=A100_L2_NOMINAL_BYTES,
         published_K_V_metadata_macro_area_mm2_if_all_layers=budget[
             "signed_K_V_metadata_macro_area_mm2"],
+        selected_layer_K_V_metadata_macro_only_area_mm2=(
+            selected_budget["signed_K_V_metadata_macro_area_mm2"]
+            if selected_budget else 0.0),
         cim_macro_count_per_layer=allocation.macro_count,
         cim_signed_unsigned_array_work_per_layer=physical_floor.native_unsigned_mav_per_token,
         cim_macro_only_optimistic_floor_us_per_layer=macro_floor_us,
