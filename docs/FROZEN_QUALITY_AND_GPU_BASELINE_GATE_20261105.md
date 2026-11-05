@@ -3,7 +3,7 @@
 ## Fixed scientific conditions
 
 - Preserve the published 7-nm Sinangil signed-K4 CIM and Yokoyama FP16-V SRAM macro geometries. Do not introduce new 7-nm synthesis or fictitious peripheral/MAC areas.
-- H100 is the user's accessible experimental GPU; no A100 hardware is claimed available. Earlier A100 numbers are source-model results, not measured baselines.
+- **Primary comparator:** MAGMA/LLMCompass A100 80GB FP16 HBM2e source model, preserving the original 7-nm architectural study. No A100 CUDA kernel measurements are available in this execution environment. H100 acquisition evidence, where historically available, remains separate and must never replace or be relabeled as the primary A100 comparator.
 - No assumed GPU kernel timing, silicon throughput, energy or end-to-end speedup. Missing measurements remain null.
 - A complete comparator must include **exact optimized GPU**, **same-quality compressed GPU**, and **compressed CIM+GPU**, each with the same model, decoder endpoint and batch/precision.
 - Frozen calibration layers cannot be retuned using either held-out WikiText test split. No statistical claims across 8B from 135M.
@@ -32,10 +32,10 @@ At native Llama-3.1-8B P2048, 32 layers, 8 KV heads, D128, all 32 layers retaine
 
 Thus extrapolating the 135M P128/M64 (2×) results to 8B full-residency P2048/M64 (32×) is not valid.
 
-Original Llama-8B dense FP16 shared-prefix K/V at P2048 contains 256 MiB. A GPU implementation of the **same compressed representation** at M64 would contain **8 MiB FP16 K/V**, or **5.0625 MiB** with packed signed K4 / FP16 V plus 4-byte-per-representative metadata. These payloads fit in nominal H100 50 MB L2 capacity; cache persistence under actual weight traffic is not established. [NVIDIA Hopper whitepaper](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/).
+Original Llama-8B dense FP16 shared-prefix K/V at P2048 contains 256 MiB. A GPU implementation of the **same compressed representation** at M64 would contain **8 MiB FP16 K/V**, or **5.0625 MiB** with packed signed K4 / FP16 V plus 4-byte-per-representative metadata. These payloads fit within the **A100 nominal 40 MB L2** capacity when all 32 layers are compressed; cache persistence under model weights and decoder execution is unmeasured. For the actually tested **four compressed layers**, the remaining 28 exact-prefix layers contain an additional 224 MiB FP16 K/V. The resulting 225 MiB hybrid KV representation does **not** fit in nominal A100 L2. The all-layer 8 MiB statement is purely hypothetical until 32-layer Llama-8B quality is measured. A100 device specification: https://www.nvidia.com/en-us/data-center/a100/.
 
 The attention-quality matched compressed GPU must therefore be measured, together with exact Hydragen/Flash and physically supported CIM peripheral rates. No real GPU performance or system-speedup result was generated in the CPU-only run.
 
 ## Decision
 
-Keep hardware feasibility/quality admission as a research direction. It currently qualifies storage capacity and small-model numerical behavior only. A publication-quality accelerator advantage requires true 8B inference at 32×, quantified O4 ADC loss, and an optimized H100 comparator running both exact and *identically compressed* attention. Stop hypothetical deadline sweeps, fabricated digital iso-area and cross-model GPU timing substitutions.
+Keep hardware feasibility/quality admission as a research direction. It currently qualifies storage capacity and small-model numerical behavior only. A publication-quality accelerator advantage requires true 8B inference at 32×, quantified O4 ADC loss, and a **primary A100 FP16** comparator covering optimized exact and compressed attention at the same output endpoint; the source-only model cannot stand in for measured kernels. Matched signed Q4K4 execution is required for a numerical-fidelity claim; an FP16-centroid GPU source timing alone is a different precision path. Stop hypothetical deadline sweeps, fabricated digital iso-area and cross-model GPU timing substitutions.
