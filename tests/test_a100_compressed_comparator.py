@@ -45,6 +45,12 @@ class A100CompressedTests(unittest.TestCase):
         self.assertIsNone(x.full_decoder_tpot_us)
         self.assertIsNone(x.hardware_speedup)
         self.assertFalse(x.digital_area_qualified)
+        self.assertEqual(x.cim_macro_count_per_layer,128)
+        self.assertEqual(x.cim_signed_unsigned_array_work_per_layer,1048576)
+        self.assertAlmostEqual(x.cim_macro_only_optimistic_floor_us_per_layer,
+                               0.044,places=12)
+        self.assertTrue(x.cim_macro_only_below_A100_HBM_unfused_source_model)
+        self.assertFalse(x.cim_macro_only_below_A100_L2_unfused_source_model)
 
     def test_same_selected_layer_is_not_all_layer_quality(self):
         for n in (0,1,4,32):
@@ -66,6 +72,11 @@ class A100CompressedTests(unittest.TestCase):
             self.assertTrue(all(math.isfinite(y) and y>0 for y in [
                 x.compressed_GPU_HBM_unfused_operator_source_us_per_layer,
                 x.compressed_GPU_L2_unfused_operator_source_us_per_layer]))
+        # For B>=8 even published macro-only time exceeds the optimistic
+        # A100 HBM unfused source operator estimate. This is a
+        # model-relative necessary check, not a hardware impossibility proof.
+        self.assertFalse(point(batch=8).cim_macro_only_below_A100_HBM_unfused_source_model)
+        self.assertAlmostEqual(point(batch=8).cim_macro_only_optimistic_floor_us_per_layer,0.352)
         for kwargs in [
             {"batch":0},{"prefix":15},{"prefix":2049},{"reps":1},
             {"reps":66},{"reps":2064},{"selected_layers":33},
