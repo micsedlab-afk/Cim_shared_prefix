@@ -31,7 +31,7 @@ All rows below use P128 and 64 centroid representatives per selected layer. **He
 
 **Why strict gating was needed:** the more permissive two-domain calibration selected 24 layers and kept training-side ΔNLL within +0.05, but suffered **+0.29435 NLL** on held-out C. This is direct evidence of calibration overfitting; the +0.05 calibration budget does not give a universal generalization guarantee.
 
-A separate eight-token earlier functional control (with repeated toy text) reconstructed all-P attention with maximum logit difference below 4e−5; its NLL must not be mixed with the 31-target held-out comparisons.
+A separate eight-token functional control (with repeated toy text and the final FP16-stored centroid values) reconstructed all-P attention with **maximum logit difference 0.0038624** and **NLL difference −0.00000492**; its NLL must not be mixed with the 31-target held-out comparisons. The earlier FP32-storage control had smaller logit differences and is a separate condition.
 
 ## B. Physical SRAM-CIM capacity
 
