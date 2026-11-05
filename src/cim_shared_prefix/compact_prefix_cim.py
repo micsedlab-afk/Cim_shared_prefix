@@ -26,18 +26,21 @@ class CentroidSummary:
     assignments: np.ndarray
     signed_k4: np.ndarray
     key_scale: np.ndarray
+    value_storage: str
 
     @property
     def num_representatives(self) -> int:
         return int(len(self.counts))
 
 
-def cluster_prefix(keys, values, representatives:int, iterations:int=8)->CentroidSummary:
+def cluster_prefix(keys, values, representatives:int, iterations:int=8,\n                   value_storage:str="fp16")->CentroidSummary:
     """Deterministic farthest-point initialization and Lloyd centroids.
 
     Keys and values are *post-RoPE* and share KV-head identity. No positional
     flattening across KV heads. Empty clusters are rejected and reinitialized.
     """
+    if value_storage not in ("fp16","fp32"):
+        raise ValueError("value storage must be explicit FP16 hardware or FP32 oracle")
     k=np.asarray(keys,dtype=np.float32)
     v=np.asarray(values,dtype=np.float32)
     if (k.ndim!=2 or v.shape!=k.shape or
@@ -86,11 +89,21 @@ def cluster_prefix(keys, values, representatives:int, iterations:int=8)->Centroi
         raise AssertionError("empty centroid after deterministic reassignment")
     kc=np.stack([k[assign==i].mean(axis=0) for i in range(representatives)])
     vc=np.stack([v[assign==i].mean(axis=0) for i in range(representatives)])
+    # V storage is physically FP16: round every centroid value to the
+    # actual 16-bit representation before subsequent attention readout.
+    if value_storage=="fp16":
+        vc=vc.astype(np.float16).astype(np.float32)
     rad=np.array([np.linalg.norm(k[assign==i]-kc[i],axis=1).max()
                   for i in range(representatives)],dtype=np.float32)
     scale=np.maximum(np.max(np.abs(kc),axis=1)/7.,1e-12)
+    # Count fits 16 bits for all 128/2048-prefix experiments; analog
+    # per-column K scale is stored with FP16 metadata in the memory model.
+    if np.max(n)>65535:
+        raise ValueError("centroid multiplicity exceeds physical uint16 metadata")
+    scale=scale.astype(np.float16).astype(np.float32)
     k4=np.clip(np.rint(kc/scale[:,None]),-7,7).astype(np.int8)
-    return CentroidSummary(kc,vc,n.astype(np.int32),rad,assign,k4,scale.astype(np.float32))
+    return CentroidSummary(kc,vc,n.astype(np.int32),rad,assign,k4,
+                           scale,value_storage)
 
 
 def _softmax_context(logits,values):
@@ -130,6 +143,7 @@ def centroid_prefix_context(queries, summary:CentroidSummary,
         s=q@dec.T/np.sqrt(d)
     elif mode=="q4k4":
         qs=np.maximum(np.max(np.abs(q),axis=1)/7.,1e-12)
+        qs=qs.astype(np.float16).astype(np.float32)
         q4=np.clip(np.rint(q/qs[:,None]),-7,7).astype(np.int32)
         prod=q4@summary.signed_k4.astype(np.int32).T
         s=prod*(qs[:,None]*summary.key_scale[None,:])/np.sqrt(d)
