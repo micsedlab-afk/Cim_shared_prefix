@@ -16,7 +16,7 @@ For P2048, B1, 128 decode steps and illustrative normalized write cost lambda=10
 | 12 mm2 | 29 | 1 | 32 to 63 | 3.10% | 2.480% |
 | 16 mm2 | 39 | 2 | 32 to 92 | 6.20% | 4.998% |
 
-**Parameter-free Pareto result:** Across the 728 original coordinates, 117 admit a feasible whole-layer pinning policy that strictly reduces packed-K4 tile programming while leaving the per-step compute-wave count unchanged. Counts by the original eight area budgets (1,2,3,4,6,8,12,16 mm2) are 0, 0, 0, 13, 13, 26, 26, 39. This proof covers those two logical resource counts; external control overhead and physical execution remain unmeasured.
+**Parameter-free Pareto result:** Across the 728 original coordinates, 117 admit a feasible whole-layer pinning policy that strictly reduces packed-K4 tile programming while leaving the per-step compute-wave count unchanged. Counts by the original eight area budgets (1,2,3,4,6,8,12,16 mm2) are 0, 0, 0, 13, 13, 26, 26, 39. This is an exact two-resource comparison within the original modeled engine geometry. The published QK-stage results remain unchanged.
 
 At 8 mm2, the threshold write-to-compute ratio for pinning one layer is 9.764 at B1, 39.055 at B4, and 78.110 at B8. Original S2 active-layer programming is not charged again.
 
