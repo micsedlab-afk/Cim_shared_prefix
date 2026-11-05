@@ -4,7 +4,9 @@ Integrated source-grounded SRAM, SRAM-CIM and SRAM + digital-MAC analysis for sh
 
 ## Scope
 
-- Study one completed-score endpoint: QK score available to scale/softmax.
+- **Primary GPU comparator:** A100 80GB FP16 HBM2e MAGMA/LLMCompass source model, preserving original native GQA and byte-correct operator counts. H100 measurements belong to a separate calibration study and must never substitute for A100.
+- **Separate two architectural endpoints:** (i) completed signed Q4K4 prefix QK scores at scale/softmax, and (ii) optional prefix context + logsumexp returned after FP16-V SRAM, streaming softmax and digital PV. The two have different area, bytes and latency and must not be conflated.
+- Evaluate exact-prefix and compressed-prefix alternatives on the GPU as well as CIM; a compressed FP16 GPU operator source model is not a numerical substitute for matched Q4K4 GPU execution.
 - Compare GPU, SRAM-only and SRAM-CIM at fully documented modeled area. Include SRAM+digital MAC only as a matched-area implementation when complete comparable physical area evidence exists; otherwise publish a conditional digital break-even threshold.
 - Include prefix placement/refill, mapping, signed arithmetic, reduction, score transport and complete decoder latency.
 - Classify all physical area evidence. Sensitivity parameters never qualify as physically comparable area. **No 7-nm synthesis and no invented digital-MAC area.**

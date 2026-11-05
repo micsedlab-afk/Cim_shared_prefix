@@ -1,6 +1,6 @@
 # GPU publication evidence recovery — 2026-11-04
 
-## Immediate conclusion
+> **A100-primary correction (5 Nov 2026).** The 7-nm OJCAS architectural comparison remains A100 80GB FP16 (MAGMA/LLMCompass) versus the published 7-nm SRAM-CIM system. A100 timings in this repository are source/operator models, not physical CUDA data. Historical H100 acquisitions cannot replace A100. The following H100-first experiment instructions concern separate GPU evidence acquisition and **do not define the primary A100 scientific comparator**. See [A100_PRIMARY_REVIEWER_REAUDIT_20261105.md](A100_PRIMARY_REVIEWER_REAUDIT_20261105.md). The competing compressed A100 GPU source model and the selected-layer-specific KV footprint must be included when interpreting full-prefix results. FP16-centroid GPU and ideal Q4K4-CIM are not numerical-equivalent by assumption.\n\n## Immediate conclusion
 
 A **competitive region against optimized Hydragen has not been demonstrated**.
 The original 2 ms architectural target was only a hypothetical deadline and
