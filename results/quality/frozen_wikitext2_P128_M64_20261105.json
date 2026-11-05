@@ -1,0 +1,162 @@
+{
+  "schema": "frozen-actual-pretrained-wikitext2-quality/v1",
+  "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42006630402",
+  "source_commit": "517f9fb39c40be7023079e1a5db626f340583956",
+  "dataset": "Salesforce/wikitext",
+  "dataset_revision": "b08601e",
+  "dataset_split": "wikitext-2-raw-v1/test",
+  "dataset_parquet_sha256": "5f1bea067869d04849c0f975a2b29c4ff47d867f484f5010ea5e861eab246d91",
+  "checkpoint": "HuggingFaceTB/SmolLM2-135M",
+  "checkpoint_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "training_or_test_policy": "frozen prior 2-domain calibration; held-out WikiText-2 does not affect selection",
+  "prefix_tokens": 128,
+  "centroids_per_selected_layer": 64,
+  "selected_layers": [
+    12,
+    13,
+    21,
+    27
+  ],
+  "data_points": 12,
+  "targets": 372,
+  "mean_strict_delta_NLL": 0.0019413332144419353,
+  "mean_first_delta_NLL": 0.014471898476282755,
+  "strict_minus_first": {
+    "mean_delta_NLL": -0.01253056526184082,
+    "mean_delta_NLL_window_bootstrap_95ci": [
+      -0.05354275753100713,
+      0.028198134899139395
+    ],
+    "relative_PPL_pct_from_mean_delta_NLL": -1.2452384618868562,
+    "windows_with_positive_delta_NLL": 5
+  },
+  "rows": [
+    {
+      "exact": 3.8340418338775635,
+      "first_delta_NLL": -0.0576932430267334,
+      "first_four": 3.77634859085083,
+      "strict_delta_NLL": -0.0075681209564208984,
+      "strict_four": 3.8264737129211426,
+      "targets": 31,
+      "token_offset": 1024,
+      "window": 0
+    },
+    {
+      "exact": 2.586355447769165,
+      "first_delta_NLL": 0.01316690444946289,
+      "first_four": 2.599522352218628,
+      "strict_delta_NLL": 0.03771638870239258,
+      "strict_four": 2.6240718364715576,
+      "targets": 31,
+      "token_offset": 5120,
+      "window": 1
+    },
+    {
+      "exact": 3.997422933578491,
+      "first_delta_NLL": 0.07510256767272949,
+      "first_four": 4.072525501251221,
+      "strict_delta_NLL": 0.025171518325805664,
+      "strict_four": 4.022594451904297,
+      "targets": 31,
+      "token_offset": 9216,
+      "window": 2
+    },
+    {
+      "exact": 2.696275234222412,
+      "first_delta_NLL": 0.1527080535888672,
+      "first_four": 2.8489832878112793,
+      "strict_delta_NLL": -0.011498451232910156,
+      "strict_four": 2.684776782989502,
+      "targets": 31,
+      "token_offset": 13312,
+      "window": 3
+    },
+    {
+      "exact": 2.4977686405181885,
+      "first_delta_NLL": 0.03745579719543457,
+      "first_four": 2.535224437713623,
+      "strict_delta_NLL": -0.000048160552978515625,
+      "strict_four": 2.49772047996521,
+      "targets": 31,
+      "token_offset": 17408,
+      "window": 4
+    },
+    {
+      "exact": 1.4763684272766113,
+      "first_delta_NLL": -0.03658401966094971,
+      "first_four": 1.4397844076156616,
+      "strict_delta_NLL": 0.005722641944885254,
+      "strict_four": 1.4820910692214966,
+      "targets": 31,
+      "token_offset": 21504,
+      "window": 5
+    },
+    {
+      "exact": 2.100440263748169,
+      "first_delta_NLL": 0.043180227279663086,
+      "first_four": 2.143620491027832,
+      "strict_delta_NLL": 0.03300285339355469,
+      "strict_four": 2.1334431171417236,
+      "targets": 31,
+      "token_offset": 25600,
+      "window": 6
+    },
+    {
+      "exact": 3.8394834995269775,
+      "first_delta_NLL": -0.13536310195922852,
+      "first_four": 3.704120397567749,
+      "strict_delta_NLL": 0.0020020008087158203,
+      "strict_four": 3.8414855003356934,
+      "targets": 31,
+      "token_offset": 29696,
+      "window": 7
+    },
+    {
+      "exact": 3.5238900184631348,
+      "first_delta_NLL": -0.021729469299316406,
+      "first_four": 3.5021605491638184,
+      "strict_delta_NLL": -0.014632463455200195,
+      "strict_four": 3.5092575550079346,
+      "targets": 31,
+      "token_offset": 33792,
+      "window": 8
+    },
+    {
+      "exact": 2.722200870513916,
+      "first_delta_NLL": 0.04306507110595703,
+      "first_four": 2.765265941619873,
+      "strict_delta_NLL": -0.04552793502807617,
+      "strict_four": 2.67667293548584,
+      "targets": 31,
+      "token_offset": 37888,
+      "window": 9
+    },
+    {
+      "exact": 2.305365562438965,
+      "first_delta_NLL": 0.04611849784851074,
+      "first_four": 2.3514840602874756,
+      "strict_delta_NLL": -0.0032279491424560547,
+      "strict_four": 2.302137613296509,
+      "targets": 31,
+      "token_offset": 41984,
+      "window": 10
+    },
+    {
+      "exact": 2.4551799297332764,
+      "first_delta_NLL": 0.014235496520996094,
+      "first_four": 2.4694154262542725,
+      "strict_delta_NLL": 0.002183675765991211,
+      "strict_four": 2.4573636054992676,
+      "targets": 31,
+      "token_offset": 46080,
+      "window": 11
+    }
+  ],
+  "limitations": [
+    "Only 135M real pretrained quality, not Llama-8B",
+    "Ideal signed Q4K4 and FP16 V, no O4 ADC response",
+    "No GPU/CIM speedup or energy",
+    "Bootstrap descriptive; correlated language sample structure",
+    "No claim of significant outperformance, CI includes zero"
+  ]
+}
