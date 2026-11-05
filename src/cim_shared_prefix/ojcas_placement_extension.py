@@ -132,6 +132,22 @@ def first_pin_threshold(batch:int,prefix:int,area_mm2:int,*,decode_batch_steps:i
     return dwave/dwrite
 
 
+
+def no_compute_penalty_pinning(batch:int,prefix:int,area_mm2:int,*,decode_batch_steps:int)->Candidate:
+    """Maximal K4-write reduction with *exactly the same* compute wave count.
+
+    This is an algebraic Pareto result on the submitted engine geometry. It
+    requires no lambda calibration; extra controller/physical sign costs are
+    outside its two-resource proof. With N=1 no write improvement is possible.
+    """
+    plans=candidates(batch,prefix,area_mm2,decode_batch_steps=decode_batch_steps)
+    base=plans[0]
+    equal=[p for p in plans if p.compute_wave_units_total==base.compute_wave_units_total]
+    if not equal:raise AssertionError("baseline must be feasible")
+    return min(equal,key=lambda p:(p.K4_tile_writes_total,
+                                    p.pinned_complete_layers))
+
+
 def run_grid(*,decode_batch_steps:int=128,lambda_values:Iterable[float]=(1.,10.,40.))->tuple[list[dict],dict]:
     lambdas=tuple(lambda_values)
     if not lambdas:raise ValueError("at least one lambda required")
@@ -140,11 +156,15 @@ def run_grid(*,decode_batch_steps:int=128,lambda_values:Iterable[float]=(1.,10.,
     for a in AREAS_MM2:
         acc={str(v):{"positive_gain":0,"selected_pins_hist":{}} for v in lambdas}
         can_pin=0
+        strict_pareto_cases=0
         for p in PREFIXES:
             for b in BATCHES:
                 baseline=candidates(b,p,a,decode_batch_steps=decode_batch_steps)[0]
                 threshold=first_pin_threshold(b,p,a,decode_batch_steps=decode_batch_steps)
                 if threshold is not None:can_pin+=1
+                free=no_compute_penalty_pinning(b,p,a,decode_batch_steps=decode_batch_steps)
+                if free.K4_tile_writes_total<baseline.K4_tile_writes_total:
+                    strict_pareto_cases+=1
                 row={
                     "B":b,"Lp":p,"Aadd_mm2":a,"Lu":128,
                     "original_engine_macros":128,"original_engines":baseline.total_engines,
@@ -153,6 +173,10 @@ def run_grid(*,decode_batch_steps:int=128,lambda_values:Iterable[float]=(1.,10.,
                     "baseline_source_K4_writes_total":baseline.K4_tile_writes_total,
                     "first_pin_threshold_lambda_normalized":threshold if threshold is not None and isfinite(threshold) else None,
                     "candidate_full_layers_possible":len(candidates(b,p,a,decode_batch_steps=decode_batch_steps))-1,
+                    "strict_pareto_no_extra_wave_pinned_layers":free.pinned_complete_layers,
+                    "strict_pareto_K4_tile_writes_saved_total":free.K4_tile_writes_saved_vs_no_pin,
+                    "strict_pareto_improves_writes_no_wave_penalty":(
+                        free.K4_tile_writes_total<baseline.K4_tile_writes_total),
                     "original_manuscript_S2_stage_speedup":None,
                     "new_policy_measured_TPOT":None,
                 }
@@ -170,6 +194,7 @@ def run_grid(*,decode_batch_steps:int=128,lambda_values:Iterable[float]=(1.,10.,
                     counts[k]=counts.get(k,0)+1
                 rows.append(row)
         summary[str(a)]={"cases":len(PREFIXES)*len(BATCHES),
+                          "strict_pareto_no_wave_penalty_cases":strict_pareto_cases,
                           "feasible_to_pin_one_full_layer_cases":can_pin,
                           "lambda_sensitivities":acc}
     assert len(rows)==728
