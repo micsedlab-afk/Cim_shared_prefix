@@ -1,6 +1,11 @@
 """Scientific unit/endpoint guards on A100 compressed-vs-exact study."""
 import math
 import unittest
+import sys
+from pathlib import Path
+
+# Match repository-wide unittest discover without requiring an editable install.
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from cim_shared_prefix.a100_compressed_comparator import (
     point, unfused_source_operator_us, fused_floor_us
 )
