@@ -69,6 +69,21 @@ class A100CompressedTests(unittest.TestCase):
         self.assertTrue(point(selected_layers=32).hybrid_FP16_KV_fits_nominal_A100_L2)
         self.assertEqual(point(selected_layers=0).selected_layer_K_V_metadata_macro_only_area_mm2,0)
 
+    def test_fp16_centroid_and_ideal_signed_q4k4_are_distinct_numerical_paths(self):
+        # This deliberately prohibits treating a cheaper FP16-centroid GPU
+        # operator as a numerically matched signed Q4K4/CIM competitor.
+        import numpy as np
+        from cim_shared_prefix.compact_prefix_cim import cluster_prefix,centroid_prefix_context
+        rng=np.random.default_rng(7755)
+        k=rng.normal(size=(128,128)).astype(np.float32)
+        v=rng.normal(size=(128,128)).astype(np.float32)
+        q=rng.normal(size=(4,128)).astype(np.float32)
+        summary=cluster_prefix(k,v,64,value_storage="fp16")
+        fp_ctx,fp_lse=centroid_prefix_context(q,summary,mode="fp32")
+        q4_ctx,q4_lse=centroid_prefix_context(q,summary,mode="q4k4")
+        self.assertGreater(float(np.max(np.abs(fp_ctx-q4_ctx))),1e-3)
+        self.assertGreater(float(np.max(np.abs(fp_lse-q4_lse))),1e-3)
+
     def test_floor_vs_source_and_no_precision_conflation(self):
         for b in (1,2,4,8,16,32):
             x=point(batch=b)
