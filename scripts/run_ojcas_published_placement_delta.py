@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Evaluate original OJCAS S2 paper-source placement Δ; no original speedup edits."""
 from __future__ import annotations
-import argparse,csv,json,sys
+import argparse,csv,json,sys,math
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from cim_shared_prefix.ojcas_published_placement_delta import (
@@ -29,8 +29,12 @@ def run(out_dir:Path):
             "original_macro_compute_us_per_step":control.macro_compute_seconds*1e6/128,
             "selected_macro_compute_us_per_step":best.macro_compute_seconds*1e6/128,
             "first_pin_critical_HBM_GBps":(
-                None if first_pin_critical_hbm_Bps(b,p,area,output_batch_steps=128) is None
-                else first_pin_critical_hbm_Bps(b,p,area,output_batch_steps=128)/1e9),
+                crit/1e9 if (crit := first_pin_critical_hbm_Bps(
+                    b,p,area,output_batch_steps=128)) is not None and math.isfinite(crit)
+                else None),
+            "first_pin_unconditional_at_finite_HBM":math.isinf(
+                first_pin_critical_hbm_Bps(b,p,area,output_batch_steps=128)
+                or 0.0),
         })
     meta["anchored_reference_points"]=anchors
     out_dir.mkdir(parents=True,exist_ok=True)
