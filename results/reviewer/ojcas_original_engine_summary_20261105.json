@@ -34,5 +34,22 @@
     "DP_amortized_B_per_decode_step": 46592
   },
   "amax_at_qk_fraction_10pct": 1.0517885744794446,
-  "qualifications": "Source geometry and normalized sensitivities; no measured A100, CIM, or full decoder runtime"
+  "qualifications": "Source geometry and normalized sensitivities; no measured A100, CIM, or full decoder runtime",
+  "placement_parameter_free_Pareto": {
+    "conditions": "strictly fewer packed K4 tile writes and exactly equal total compute waves, same 128-macro engine geometry; no added area, physical control cost not included",
+    "coordinates": 117,
+    "denominator": 728,
+    "by_area": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 13,
+      "6": 13,
+      "8": 26,
+      "12": 26,
+      "16": 39
+    },
+    "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42048245554"
+  },
+  "execution_tests_passed": 17
 }
