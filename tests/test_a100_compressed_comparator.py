@@ -18,6 +18,8 @@ class A100CompressedTests(unittest.TestCase):
         self.assertEqual(x.total_FP16_KV_bytes_selective_hybrid,235929600)
         self.assertTrue(x.full_compressed_fp16_KV_fits_nominal_A100_L2)
         self.assertFalse(x.hybrid_FP16_KV_fits_nominal_A100_L2)
+        self.assertAlmostEqual(x.selected_layer_K_V_metadata_macro_only_area_mm2,
+                               1.791018082191781,places=10)
         self.assertAlmostEqual(x.published_K_V_metadata_macro_area_mm2_if_all_layers,
             14.274279452054795,places=10)
 
@@ -59,6 +61,7 @@ class A100CompressedTests(unittest.TestCase):
                 n*262144+(32-n)*8388608)
         self.assertFalse(point(selected_layers=4).hybrid_FP16_KV_fits_nominal_A100_L2)
         self.assertTrue(point(selected_layers=32).hybrid_FP16_KV_fits_nominal_A100_L2)
+        self.assertEqual(point(selected_layers=0).selected_layer_K_V_metadata_macro_only_area_mm2,0)
 
     def test_floor_vs_source_and_no_precision_conflation(self):
         for b in (1,2,4,8,16,32):
