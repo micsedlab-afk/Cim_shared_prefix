@@ -1,0 +1,318 @@
+{
+  "schema": "ojcas_2026_original_128macro_published_stage_placement_source/v1",
+  "provenance": {
+    "workflow_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42051149482",
+    "tests_passed": 25,
+    "stage_inputs": "manuscript Table 2 / Section III-B, 2039GB/s HBM, 200ps/row x64, 5.5ns/native macro; source serial model"
+  },
+  "original_model_preserved": {
+    "engine_macro_count": 128,
+    "engine_area_mm2": 0.4096,
+    "original_QK_stage_max_speedup": 1.97,
+    "area_8mm2_wins": "60/91",
+    "area_12mm2_wins": "60/91"
+  },
+  "source_delta_728": {
+    "by_area": {
+      "1": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 0,
+        "source_serial_mean_gain_positive_only": 0,
+        "source_serial_positive_delta_cases": 0
+      },
+      "2": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 0,
+        "source_serial_mean_gain_positive_only": 0,
+        "source_serial_positive_delta_cases": 0
+      },
+      "3": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 0,
+        "source_serial_mean_gain_positive_only": 0,
+        "source_serial_positive_delta_cases": 0
+      },
+      "4": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 13,
+        "source_serial_mean_gain_positive_only": 0.010829108588670425,
+        "source_serial_positive_delta_cases": 13
+      },
+      "6": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 13,
+        "source_serial_mean_gain_positive_only": 0.02165821717734084,
+        "source_serial_positive_delta_cases": 13
+      },
+      "8": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 26,
+        "source_serial_mean_gain_positive_only": 0.023322284534966632,
+        "source_serial_positive_delta_cases": 26
+      },
+      "12": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 26,
+        "source_serial_mean_gain_positive_only": 0.0466445690699331,
+        "source_serial_positive_delta_cases": 26
+      },
+      "16": {
+        "coordinates": 91,
+        "parameter_free_no_compute_wave_penalty_cases": 39,
+        "source_serial_mean_gain_positive_only": 0.04895412604032147,
+        "source_serial_positive_delta_cases": 39
+      }
+    },
+    "anchors": [
+      {
+        "Aadd_mm2": 8,
+        "B": 1,
+        "P": 2048,
+        "first_pin_critical_HBM_GBps": 193.33320944753132,
+        "first_pin_unconditional_at_finite_HBM": false,
+        "incremental_3component_delta_us_per_batch_step": 0,
+        "optimized_3component_us_per_batch_step": 17.569917802844532,
+        "original_3component_us_per_batch_step": 17.569917802844532,
+        "original_K4_supply_us_per_step": 16.456317802844534,
+        "original_engines": 19,
+        "original_macro_compute_us_per_step": 0.704,
+        "original_program_us_per_step": 0.4096,
+        "selected_K4_supply_us_per_step": 16.456317802844534,
+        "selected_macro_compute_us_per_step": 0.704,
+        "selected_pinned_layers": 0,
+        "selected_program_us_per_step": 0.4096
+      },
+      {
+        "Aadd_mm2": 12,
+        "B": 1,
+        "P": 2048,
+        "first_pin_critical_HBM_GBps": 975.8784354188161,
+        "first_pin_unconditional_at_finite_HBM": false,
+        "incremental_3component_delta_us_per_batch_step": 0,
+        "optimized_3component_us_per_batch_step": 17.569917802844532,
+        "original_3component_us_per_batch_step": 17.569917802844532,
+        "original_K4_supply_us_per_step": 16.456317802844534,
+        "original_engines": 29,
+        "original_macro_compute_us_per_step": 0.704,
+        "original_program_us_per_step": 0.4096,
+        "selected_K4_supply_us_per_step": 16.456317802844534,
+        "selected_macro_compute_us_per_step": 0.704,
+        "selected_pinned_layers": 0,
+        "selected_program_us_per_step": 0.4096
+      },
+      {
+        "Aadd_mm2": 16,
+        "B": 1,
+        "P": 2048,
+        "first_pin_critical_HBM_GBps": null,
+        "first_pin_unconditional_at_finite_HBM": true,
+        "incremental_3component_delta_us_per_batch_step": -0.52294227562531,
+        "optimized_3component_us_per_batch_step": 17.04697552721922,
+        "original_3component_us_per_batch_step": 17.569917802844532,
+        "original_K4_supply_us_per_step": 16.456317802844534,
+        "original_engines": 39,
+        "original_macro_compute_us_per_step": 0.704,
+        "original_program_us_per_step": 0.4096,
+        "selected_K4_supply_us_per_step": 15.946075527219223,
+        "selected_macro_compute_us_per_step": 0.704,
+        "selected_pinned_layers": 1,
+        "selected_program_us_per_step": 0.39690000000000003
+      },
+      {
+        "Aadd_mm2": 16,
+        "B": 4,
+        "P": 2048,
+        "first_pin_critical_HBM_GBps": null,
+        "first_pin_unconditional_at_finite_HBM": true,
+        "incremental_3component_delta_us_per_batch_step": -0.52294227562531,
+        "optimized_3component_us_per_batch_step": 19.158975527219223,
+        "original_3component_us_per_batch_step": 19.68191780284453,
+        "original_K4_supply_us_per_step": 16.456317802844534,
+        "original_engines": 39,
+        "original_macro_compute_us_per_step": 2.816,
+        "original_program_us_per_step": 0.4096,
+        "selected_K4_supply_us_per_step": 15.946075527219223,
+        "selected_macro_compute_us_per_step": 2.816,
+        "selected_pinned_layers": 1,
+        "selected_program_us_per_step": 0.39690000000000003
+      },
+      {
+        "Aadd_mm2": 8,
+        "B": 1,
+        "P": 512,
+        "first_pin_critical_HBM_GBps": null,
+        "first_pin_unconditional_at_finite_HBM": true,
+        "incremental_3component_delta_us_per_batch_step": -0.4207817067189808,
+        "optimized_3component_us_per_batch_step": 4.806897743992153,
+        "original_3component_us_per_batch_step": 5.2276794507111335,
+        "original_K4_supply_us_per_step": 4.114079450711134,
+        "original_engines": 19,
+        "original_macro_compute_us_per_step": 0.704,
+        "original_program_us_per_step": 0.4096,
+        "selected_K4_supply_us_per_step": 3.731397743992153,
+        "selected_macro_compute_us_per_step": 0.704,
+        "selected_pinned_layers": 3,
+        "selected_program_us_per_step": 0.3715
+      },
+      {
+        "Aadd_mm2": 16,
+        "B": 128,
+        "P": 32768,
+        "first_pin_critical_HBM_GBps": null,
+        "first_pin_unconditional_at_finite_HBM": false,
+        "incremental_3component_delta_us_per_batch_step": 0,
+        "optimized_3component_us_per_batch_step": 896.9522848455124,
+        "original_3component_us_per_batch_step": 896.9522848455124,
+        "original_K4_supply_us_per_step": 263.30108484551255,
+        "original_engines": 39,
+        "original_macro_compute_us_per_step": 630.7839999999999,
+        "original_program_us_per_step": 2.8672000000000004,
+        "selected_K4_supply_us_per_step": 263.30108484551255,
+        "selected_macro_compute_us_per_step": 630.7839999999999,
+        "selected_pinned_layers": 0,
+        "selected_program_us_per_step": 2.8672000000000004
+      }
+    ]
+  },
+  "temporal_reuse_5824": {
+    "output_lengths": [
+      1,
+      32,
+      128,
+      512
+    ],
+    "reuse_batch_counts": [
+      1,
+      8
+    ],
+    "positive_by_O_reuse": [
+      {
+        "O": 1,
+        "R": 1,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "6": 0,
+          "8": 0,
+          "12": 0,
+          "16": 0
+        },
+        "positive": 0
+      },
+      {
+        "O": 1,
+        "R": 8,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 32,
+        "R": 1,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 32,
+        "R": 8,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 128,
+        "R": 1,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 128,
+        "R": 8,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 512,
+        "R": 1,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      },
+      {
+        "O": 512,
+        "R": 8,
+        "by_area": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 13,
+          "6": 13,
+          "8": 26,
+          "12": 26,
+          "16": 39
+        },
+        "positive": 117
+      }
+    ]
+  },
+  "limits": [
+    "Only three common S2 components (HBM K source, wave programming, native array)",
+    "Serial model, not measured GPU or silicon timing",
+    "No R0-R3 quality or original pointwise GPU speedups changed",
+    "S2 per-request suffix, score merge and decoder GPU remainder unchanged and omitted",
+    "No actual measured full decoder speedup, energy, TPOT or new digital area"
+  ]
+}
