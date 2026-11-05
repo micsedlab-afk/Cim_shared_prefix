@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from cim_shared_prefix.ojcas_placement_extension import (
-    candidates,dimensionless_cost,optimize,first_pin_threshold,run_grid
+    candidates,dimensionless_cost,optimize,first_pin_threshold,run_grid,no_compute_penalty_pinning
 )
 from cim_shared_prefix.ojcas_manuscript_baseline import manuscript_grid
 
@@ -81,6 +81,28 @@ class OriginalEnginePlacementTests(unittest.TestCase):
                 self.assertGreaterEqual(x[f"lambda_{val:g}_dimensionless_cost_gain_fraction"],-1e-12)
                 self.assertLessEqual(x[f"lambda_{val:g}_dimensionless_cost_gain_fraction"],1.+1e-12)
         self.assertEqual(oldmeta["paper_max_modeled_QK_stage_speedup"],1.97)
+
+    def test_parameter_free_strict_Pareto_original_engine_savings(self):
+        p=no_compute_penalty_pinning(1,2048,16,decode_batch_steps=128)
+        base=candidates(1,2048,16,decode_batch_steps=128)[0]
+        self.assertEqual(p.pinned_complete_layers,1)
+        self.assertEqual(p.compute_tile_waves_per_batch_step,
+                         base.compute_tile_waves_per_batch_step)
+        self.assertEqual(p.K4_tile_writes_saved_vs_no_pin,16*127)
+        self.assertEqual(no_compute_penalty_pinning(
+            1,2048,8,decode_batch_steps=128).pinned_complete_layers,0)
+        self.assertEqual(no_compute_penalty_pinning(
+            1,512,8,decode_batch_steps=128).pinned_complete_layers,3)
+        self.assertEqual(no_compute_penalty_pinning(
+            1,2048,16,decode_batch_steps=1).K4_tile_writes_saved_vs_no_pin,0)
+        rows,meta=run_grid()
+        per_area=[meta["areas"][str(a)]["strict_pareto_no_wave_penalty_cases"]
+                  for a in (1,2,3,4,6,8,12,16)]
+        self.assertEqual(per_area,[0,0,0,13,13,26,26,39])
+        self.assertEqual(sum(per_area),117)
+        self.assertEqual(
+            sum(bool(x["strict_pareto_improves_writes_no_wave_penalty"])
+                for x in rows),117)
 
     def test_reject_unphysical_inputs(self):
         for kwargs in [
