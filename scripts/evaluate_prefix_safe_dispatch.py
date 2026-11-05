@@ -20,6 +20,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 from evaluate_pretrained_compact_prefix import (
     MODEL,REVISION,replace_attention_prefix,nll_and_logits
 )
+from cim_shared_prefix.compact_prefix_cim import macro_summary_area
 
 PASSAGES=(
 """At the university laboratory the team designed an instrument that measures
