@@ -1,0 +1,103 @@
+{
+  "schema": "frozen-actual-pretrained-wikitext2-quality-32x/v1",
+  "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42007059366",
+  "source_commit": "f2803cab72de56d6a2e2acd3cf7fff5d326238cc",
+  "dataset": "Salesforce/wikitext",
+  "dataset_revision": "b08601e",
+  "dataset_split": "wikitext-2-raw-v1/test",
+  "dataset_parquet_sha256": "5f1bea067869d04849c0f975a2b29c4ff47d867f484f5010ea5e861eab246d91",
+  "checkpoint": "HuggingFaceTB/SmolLM2-135M",
+  "checkpoint_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "calibration": "P128 two-domain fixed layer set, not recalibrated for P2048; WikiText held out",
+  "prefix_tokens": 2048,
+  "centroids_per_selected_layer": 64,
+  "compression_ratio": 32,
+  "selected_layers": [
+    12,
+    13,
+    21,
+    27
+  ],
+  "windows": 6,
+  "targets": 186,
+  "mean_strict_delta_NLL": 0.055205325285593666,
+  "mean_first_delta_NLL": 0.09567882617314656,
+  "strict_minus_first": {
+    "mean_delta_NLL": -0.040473500887552895,
+    "mean_delta_NLL_window_bootstrap_95ci": [
+      -0.11015506585439046,
+      0.03262861569722494
+    ],
+    "relative_PPL_pct_from_mean_delta_NLL": -3.966538781088368,
+    "windows_with_positive_delta_NLL": 2
+  },
+  "rows": [
+    {
+      "exact": 3.288867473602295,
+      "first_delta_NLL": 0.07694458961486816,
+      "first_four": 3.365812063217163,
+      "strict_delta_NLL": 0.16904830932617188,
+      "strict_four": 3.457915782928467,
+      "targets": 31,
+      "token_offset": 4096,
+      "window": 0
+    },
+    {
+      "exact": 1.0637365579605103,
+      "first_delta_NLL": 0.00025594234466552734,
+      "first_four": 1.0639925003051758,
+      "strict_delta_NLL": 0.07270491123199463,
+      "strict_four": 1.1364414691925049,
+      "targets": 31,
+      "token_offset": 12288,
+      "window": 1
+    },
+    {
+      "exact": 3.4732542037963867,
+      "first_delta_NLL": 0.19277667999267578,
+      "first_four": 3.6660308837890625,
+      "strict_delta_NLL": 0.10258221626281738,
+      "strict_four": 3.575836420059204,
+      "targets": 31,
+      "token_offset": 20480,
+      "window": 2
+    },
+    {
+      "exact": 2.0512185096740723,
+      "first_delta_NLL": 0.007871150970458984,
+      "first_four": 2.0590896606445312,
+      "strict_delta_NLL": -0.04896831512451172,
+      "strict_four": 2.0022501945495605,
+      "targets": 31,
+      "token_offset": 28672,
+      "window": 3
+    },
+    {
+      "exact": 3.1144797801971436,
+      "first_delta_NLL": 0.14508533477783203,
+      "first_four": 3.2595651149749756,
+      "strict_delta_NLL": -0.01825690269470215,
+      "strict_four": 3.0962228775024414,
+      "targets": 31,
+      "token_offset": 36864,
+      "window": 4
+    },
+    {
+      "exact": 3.432410717010498,
+      "first_delta_NLL": 0.1511392593383789,
+      "first_four": 3.583549976348877,
+      "strict_delta_NLL": 0.05412173271179199,
+      "strict_four": 3.48653244972229,
+      "targets": 31,
+      "token_offset": 45056,
+      "window": 5
+    }
+  ],
+  "limitations": [
+    "Only 135M inference and 4/30 compressed layers; not all-layer quality or Llama8B",
+    "P128 and P2048 use different held-out windows, no paired attribution to compression factor alone",
+    "Ideal Q4K4 with FP16 centroid V, no characterized O4 ADC",
+    "No direct CUDA or hardware speedup",
+    "Bootstrap across 6 windows descriptive; strict advantage over first4 inconclusive"
+  ]
+}
