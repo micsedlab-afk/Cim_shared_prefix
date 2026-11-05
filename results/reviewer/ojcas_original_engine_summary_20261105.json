@@ -1,0 +1,55 @@
+{
+  "schema": "ojcas_original_S2_policy_exec_v1",
+  "run_url": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42047435257",
+  "tests_passed": 16,
+  "coordinates": 728,
+  "original_engine_macro_count": 128,
+  "original_stage_best_modeled_speedup": 1.97,
+  "case_P2048_B1": {
+    "A8": {
+      "engines": 19,
+      "pinned_at_lambda10": 1,
+      "compute_waves_before": 32,
+      "compute_waves_after": 187,
+      "cold_plus_warm_tiles_before": 65536,
+      "cold_plus_warm_tiles_after": 63504,
+      "dimensionless_gain": 0.0007278726708074534,
+      "pin_threshold_lambda": 9.763779527559056
+    },
+    "A12": {
+      "engines": 29,
+      "pinned_at_lambda10": 1,
+      "cost_gain": 0.024796195652173912
+    },
+    "A16": {
+      "engines": 39,
+      "pinned_at_lambda10": 2,
+      "cost_gain": 0.0499805900621118
+    }
+  },
+  "S1_P2048_A8_R1_O128": {
+    "HD_initial_K4_bytes": 29163520,
+    "DP_initial_K4_bytes": 5963776,
+    "HD_amortized_B_per_decode_step": 227840,
+    "DP_amortized_B_per_decode_step": 46592
+  },
+  "amax_at_qk_fraction_10pct": 1.0517885744794446,
+  "qualifications": "Source geometry and normalized sensitivities; no measured A100, CIM, or full decoder runtime",
+  "placement_parameter_free_Pareto": {
+    "conditions": "strictly fewer packed K4 tile writes and exactly equal total compute waves, same 128-macro engine geometry; no added area, physical control cost not included",
+    "coordinates": 117,
+    "denominator": 728,
+    "by_area": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 13,
+      "6": 13,
+      "8": 26,
+      "12": 26,
+      "16": 39
+    },
+    "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42048245554"
+  },
+  "execution_tests_passed": 17
+}
