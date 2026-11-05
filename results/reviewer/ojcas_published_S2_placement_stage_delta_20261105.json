@@ -313,6 +313,6 @@
     "Serial model, not measured GPU or silicon timing",
     "No R0-R3 quality or original pointwise GPU speedups changed",
     "S2 per-request suffix, score merge and decoder GPU remainder unchanged and omitted",
-    "No actual measured full decoder speedup, energy, TPOT or new digital area"
+    "No measured full decoder speedup, system energy, or TPOT is established"
   ]
 }

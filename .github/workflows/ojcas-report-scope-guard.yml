@@ -1,0 +1,43 @@
+name: OJCAS Reviewer-Facing Scope and Baseline Guard
+on:
+  push:
+    branches: [fix/ojcas-macro-model-report-scope-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paper-preserving-report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check active report language and original source model
+        run: |
+          PYTHONPATH=src python -m unittest -v tests.test_ojcas_report_scope tests.test_ojcas_manuscript_baseline tests.test_ojcas_published_placement_delta tests.test_ojcas_output_reuse_sweep
+      - name: Re-execute original published-input placement without modifying the manuscript
+        run: |
+          python scripts/run_ojcas_published_placement_delta.py --out-dir /tmp/ojcas_report_check
+          python scripts/run_ojcas_output_reuse_sweep.py --out-dir /tmp/ojcas_report_check
+          python - <<'PY'
+          from pathlib import Path
+          import csv,json
+          base=Path('/tmp/ojcas_report_check')
+          m=json.loads((base/'original_728_published_S2_placement_stage_delta.json').read_text())
+          n=json.loads((base/'ojcas_original_S2_output_reuse_5824.json').read_text())
+          assert 'additional_sram_controller_area' not in m
+          assert m['original_max_modeled_s2_QK_stage_speedup']==1.97
+          assert n['total_scenarios']==5824
+          assert sum(x['source_serial_positive_delta_cases'] for x in m['by_area'].values())==117
+          with (base/'original_728_published_S2_placement_stage_delta.csv').open() as f:
+              assert len(list(csv.DictReader(f)))==728
+          with (base/'ojcas_original_S2_output_reuse_5824.csv').open() as f:
+              assert len(list(csv.DictReader(f)))==5824
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ojcas-original-model-clean-publication-scope
+          path: /tmp/ojcas_report_check
+          if-no-files-found: error

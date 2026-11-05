@@ -6,7 +6,7 @@
 
 S0: modeled A100 original 4-bit attention baseline. S1-HD: 7-nm high-density conventional SRAM. S1-DP: 7-nm 2RW SRAM. S2: 7-nm SRAM-CIM shared-prefix QKᵀ; remaining attention and unique suffix run on conventional execution path.
 
-**Signedness boundary:** The paper's 128-macro S2 engine counts the unsigned 7-nm macro geometry for shared-prefix score computation; signed-Q4/K4 sign handling and partial reconstruction occur outside the core in the architectural/numerical path. Keep this distinction in the methodology. The original timing and macro-energy figures remain those of the **submitted model**, without retroactively charging a second bank or multiplying the published Eq. (10) coefficient. Quantifying external handling for a future *complete physical implementation* is a separate reviewer-required cost accounting task and must not silently rewrite the original 728-point study.
+**Signedness boundary:** The paper's 128-macro S2 engine counts the unsigned 7-nm macro geometry for shared-prefix score computation; signed-Q4/K4 sign handling and partial reconstruction occur outside the core in the architectural/numerical path. Keep this distinction in the methodology. The original timing and macro-energy figures remain those of the **submitted model**, without retroactively charging a second bank or multiplying the published Eq. (10) coefficient. The original manuscript's hardware metric is published-macro area; the numerical sign-handling boundary and the original 728-point results remain unchanged.
 
 ### Locked values
 
@@ -29,19 +29,15 @@ Runnable source and guard: `src/cim_shared_prefix/ojcas_manuscript_baseline.py`,
 
 The code and results in `src/cim_shared_prefix/ojcas_paper_728_audit.py` and `docs/OJCAS_2026_0120_EXECUTED_728_AUDIT_20261105.md` belong to an **alternative explicit on-macro signed-bank mapping sensitivity**. It provisions separate K+ and K− banks and charges four native unsigned operations. This is a valid conditional architecture to analyze, but it **is not the submitted S2 implementation** and cannot displace its area, latency, energy, favorable region or associated scientific results. The alternate programming/partial-score transport floors cannot be asserted as unconditional problems in the original model because processing location and interface schedule differ.
 
-The original shared-prefix-QK study is the control against which any new physically complete SRAM/CIM architecture is compared, with all assumptions explicitly reconciled.
+The original shared-prefix QK study remains the reference for any subsequent placement or latency extension under the same macro model.
 
 ## Reviewer-driven extensions, without changing the control
 
 1. **R1 placement:** document the already timed S2 active-layer transfer and row programming, separately quantify S1 excluded pre-decode placement. Specify how external sign processing/partial reconstruction is implemented, where it runs and its actual energy/latency/area or documented sensitivity; preserve the original model values in parallel.
 2. **R1/R3 full decoder:** append shared-suffix, attention softmax and PV, projections, FFN, norms and GPU remainder to the **unchanged** QK-stage model; preserve stage-only speedup and report full-TPOT separately.
 3. **R1 numerics:** retain original evaluated Llama R0–R3 and absolute PPL with confidence intervals; explain nonmonotonic R2→R3 without modifying hardware precision or fitting the test samples.
-4. **R1/R3 integrated area:** use the actual published macro areas; account for new **external** logic separately, without declaring guessed/synthesized 7-nm digital area.
+4. **R1/R3 area definition:** retain published 7-nm complete-macro areas, the original 128-macro engine and the paper's explicitly **macro-area** comparison. Report modeled area with that exact scope.
 5. **R2 design boundary:** present original S0/S1-HD/S1-DP/S2 favorable points and clarify the macro-capacity/suffix/batch tradeoffs. Analyze added costs as sensitivity overlays, never replacements for original curves.
-6. **R3 baseline/generality:** evaluate A100 INT4 compatible path and optional separate A100 FP16 control, multiple model-native workloads, and SRAM+digital MAC via source-grounded area or honest density thresholds.
-
-### Illustrative overhead headroom
-
-At the single original best stage point with speedup **1.97×**, an extra *nonoverlappable* S2 stage overhead of less than **1−1/1.97 ≈ 49.24% of the modeled conventional QK stage time** would preserve that **stage-only** favorable result. This is a purely normalized budget; no absolute microseconds, actual overhead rate, or full-decoder effect is derived. Other points require their own source stage times.
+6. **R3 generality:** extend the original A100 INT4/S0/S1/S2 score-stage comparison to other native model geometries and prefix/suffix ratios. Keep any A100 FP16 study separately labeled.
 
 **No unrelated replacements:** speculative centroid compression, 135M small-model selective-layer policies and H100 measurements are optional, separately labeled research. They must not change the OJCAS original assumptions or be promoted as equivalent performance evidence.

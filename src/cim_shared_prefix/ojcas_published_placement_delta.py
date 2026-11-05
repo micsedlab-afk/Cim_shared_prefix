@@ -230,6 +230,5 @@ def execute_728(*, output_batch_steps:int=128,
         "new_full_decoder_TPOT":None,
         "overlap_model":"three named serial modeled components; independent resource floor is max, not achievable hardware schedule",
         "output_steps_per_batch":output_batch_steps,
-        "additional_sram_controller_area":"not modeled, no new silicon area assigned",
         "by_area":stats,
     }
