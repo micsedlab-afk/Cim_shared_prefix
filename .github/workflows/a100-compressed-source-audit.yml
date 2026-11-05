@@ -1,0 +1,46 @@
+name: A100 FP16 Exact and Compressed Shared-Prefix Source Audit
+on:
+  push:
+    branches: [research/a100-fair-compressed-baseline-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-matched-a100-operator-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU-only source model dependencies
+        run: python -m pip install 'numpy==1.26.4'
+      - name: Guard model scientific claims and source-unit arithmetic
+        run: |
+          python -m compileall -q src/cim_shared_prefix/a100_compressed_comparator.py scripts/run_a100_compressed_comparison.py
+          PYTHONPATH=src python -m unittest -v tests.test_a100_compressed_comparator
+      - name: Execute A100 FP16 source at native Llama GQA P2048 M64
+        run: |
+          python scripts/run_a100_compressed_comparison.py --out /tmp/A100_FP16_compressed_shared_prefix.json
+          python - <<'PY'
+          import json,math
+          d=json.load(open('/tmp/A100_FP16_compressed_shared_prefix.json'))
+          assert d['a100_kernel_measurements']==0 and d['hardware_speedup'] is None
+          assert d['all_layers_quality']=='UNMEASURED_LLAMA_8B'
+          assert len(d['rows'])==6
+          for x in d['rows']:
+              assert x['measured_a100'] is False and x['hardware_speedup'] is None
+              assert x['digital_area_qualified'] is False
+              assert x['full_compressed_fp16_KV_fits_nominal_A100_L2'] is True
+              assert x['hybrid_FP16_KV_fits_nominal_A100_L2'] is False
+          x=d['rows'][0]
+          assert math.isclose(x['compressed_GPU_HBM_fused_optimistic_floor_us_per_layer'],0.12856498283472292,abs_tol=1e-9)
+          assert math.isclose(x['compressed_GPU_L2_unfused_operator_source_us_per_layer'],0.04265826109797741,abs_tol=1e-9)
+          assert math.isclose(x['exact_GPU_HBM_unfused_operator_source_us_per_layer'],4.44352721922511,abs_tol=1e-8)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: A100-FP16-byte-correct-compressed-GQA-source-model
+          path: /tmp/A100_FP16_compressed_shared_prefix.json
+          if-no-files-found: error
