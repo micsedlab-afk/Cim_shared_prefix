@@ -17,7 +17,7 @@ jobs:
       - name: Verify original paper and alternative placement remain separate
         run: |
           python -m compileall -q src/cim_shared_prefix/ojcas_placement_extension.py scripts/run_ojcas_placement_ablation.py
-          python -m unittest -v tests.test_ojcas_manuscript_baseline tests.test_ojcas_placement_extension
+          python -m unittest -v tests.test_ojcas_manuscript_baseline tests.test_ojcas_placement_extension tests.test_ojcas_review_scope
       - name: Execute full 728-point original-S2 placement policy ablation
         run: |
           python scripts/run_ojcas_placement_ablation.py --out-dir /tmp/ojcas_placement
@@ -37,6 +37,24 @@ jobs:
           assert not any(r['original_manuscript_S2_stage_speedup'] for r in rows)
           ref=next(p for p in m['reference_points'] if p['area']==8 and p['batch']==1)
           assert ref['E']==19 and ref['selected_k']==1
+          PY
+      - name: Execute S1 excluded cold placement and S2 stage-scope bounds
+        run: |
+          python scripts/run_ojcas_review_scope.py --out-dir /tmp/ojcas_placement
+          python - <<'PY'
+          import json,math
+          from pathlib import Path
+          d=Path('/tmp/ojcas_placement')
+          j=json.loads((d/'original_S1_placement_and_S2_scope.json').read_text())
+          assert j['qualified_gpu_end_to_end_TPOT'] is None
+          assert j['qualified_model_level_tokens_per_second'] is None
+          ref=next(p for p in j['S1_placement_sensitivities']
+                   if p['technology']=='S1-HD' and p['consecutive_batches_sharing_prefix']==1)
+          assert ref['physical_placed_K4_bytes_once']==29163520
+          assert math.isclose(ref['placement_us_per_batch_step_at_unqualified_interface_rate'],.22784)
+          f=next(p for p in j['decoder_scope_sensitivities']
+                 if p['qk_share_of_original_full_decoder']==.1)
+          assert math.isclose(f['no_added_overhead_upper_envelope'],1/(.9+.1/1.97))
           PY
       - uses: actions/upload-artifact@v4
         with:
