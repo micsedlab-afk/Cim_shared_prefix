@@ -1,0 +1,77 @@
+name: OJCAS Original 728-Point Signed-CIM Requalification
+on:
+  push:
+    branches: [research/ojcas-728-signed-requalification-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-grid-source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and test exact submitted-paper geometry and signed corrections
+        run: |
+          python -m compileall -q src/cim_shared_prefix/ojcas_paper_728_audit.py scripts/run_ojcas_728_requalification.py
+          python -m unittest -v tests.test_ojcas_728_requalification tests.test_ojcas_absolute_quality tests.test_ojcas_resource_screen
+      - name: Execute the complete 728-coordinate paper-grid physical-accounting audit
+        run: |
+          python scripts/run_ojcas_728_requalification.py --out-dir /tmp/ojcas_review
+          python - <<'PY'
+          import csv,json,math
+          from pathlib import Path
+          d=Path('/tmp/ojcas_review')
+          j=json.loads((d/'ojcas_728_signed_macro_audit.json').read_text())
+          with (d/'ojcas_728_signed_macro_audit.csv').open() as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==728 and j['executed_coordinates']==728
+          assert j['qualified_INT4_A100_GPU_stage_times']==0
+          assert j['requalified_original_S2_speedup_coordinates']==0
+          assert j['qualified_full_decoder_TPOT']==0
+          assert j['full_chip_isoarea_qualified'] is False
+          assert all(r['corrected_qualified_S2_speedup']=='' for r in rows)
+          assert sum(j['original_manuscript_evidence']['reported_S2_win_counts_by_area_PAPER_ONLY'].values())==276
+          e=j['partial_macro_energy_recalculation']
+          assert e['access_count_correction_factor']==4.0
+          assert math.isclose(e['corrected_HD_nominal_energy_crossing_B'],10.214224507283632)
+          assert math.isclose(e['corrected_DP_nominal_energy_crossing_B'],6.361610968294772)
+          PY
+      - name: Export original Llama R0-R3 absolute PPL and numerical-stage effects
+        run: |
+          python scripts/export_ojcas_absolute_quality.py --out-dir /tmp/ojcas_review
+          python - <<'PY'
+          import csv,json,math
+          from pathlib import Path
+          p=Path('/tmp/ojcas_review')
+          q=json.loads((p/'ojcas_absolute_ppl_summary.json').read_text())
+          assert len(q['rows'])==3
+          assert q['nonmonotonic_R3_lower_than_R2_at_2048']
+          assert math.isclose(q['rows'][1]['R0_BF16_ppl'],5.4807592498153035)
+          assert math.isclose(q['rows'][1]['R3_circuit_ppl'],5.665858560372165)
+          with (p/'ojcas_absolute_ppl_R0_R3.csv').open() as f:
+              assert len(list(csv.DictReader(f)))==12
+          PY
+      - name: Quantify overlap-safe mandatory programming and score-transfer thresholds
+        run: |
+          python scripts/run_ojcas_resource_screen.py --out-dir /tmp/ojcas_review
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          p=Path('/tmp/ojcas_review')
+          s=json.loads((p/'ojcas_728_conditional_1TBps_resource_screen.json').read_text())
+          assert s['source_original_grid_coordinates']==728
+          assert not s['hardware_speedup_qualified']
+          with (p/'ojcas_728_conditional_1TBps_resource_screen.csv').open() as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==728
+          assert all(x['qualified_a100_INT4_speedup']=='' for x in rows)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OJCAS-728-original-grid-signed-requalification
+          path: /tmp/ojcas_review
+          if-no-files-found: error
