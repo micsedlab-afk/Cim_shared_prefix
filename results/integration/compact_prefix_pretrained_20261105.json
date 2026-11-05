@@ -1,0 +1,80 @@
+{
+  "schema": "compact-prefix-7nm-pretrained-actual-inference-results-20261105/v1",
+  "date": "2026-11-05",
+  "experimental_scope": "Pretrained SmolLM2-135M native GQA, FP32 model, 64 key centroid reps out of P128, ideal Q4K4 signed dot, physically stored FP16 centroid V, exact suffix+fallback, software CPU",
+  "checkpoint": "HuggingFaceTB/SmolLM2-135M",
+  "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "P": 128,
+  "O": 32,
+  "targets_per_passage": 31,
+  "calibration_domains": 2,
+  "heldout_domains": 1,
+  "heldout_tokens": 31,
+  "weights_used": true,
+  "holdout_exact_nll": 3.257781982421875,
+  "policies": {
+    "strict_four": {
+      "selected_layers": [
+        12,
+        13,
+        21,
+        27
+      ],
+      "layer_count": 4,
+      "NLL_delta": 0.03412652015686035,
+      "NLL": 3.2919085025787354,
+      "relative_PPL_increase_pct": 3.47155108156747,
+      "first_four_control_delta_NLL": 0.13325953483581543,
+      "same_K_optimization_NLL_penalty_reduction_pct": 74.39093555376245,
+      "macro_only_area_mm2": 0.45981808219178083,
+      "macro_record": {
+        "FP16_V_SRAM_macros": 16,
+        "M": 64,
+        "layers": 4,
+        "macro_only": true,
+        "metadata_SRAM_macros": 1,
+        "signed_K_CIM_macros": 96,
+        "signed_K_V_metadata_macro_area_mm2": 0.45981808219178083,
+        "unmodeled_peripheral_area_mm2": null
+      },
+      "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42002167366",
+      "selection_policy": "predeclared: each admitted layer must have delta NLL <=0 on both calibration domains and combined delta NLL <=0.05 on each calibration domain; zero access to held-out third domain"
+    },
+    "loose_24": {
+      "layer_count": 24,
+      "delta_NLL": 0.29434967041015625,
+      "relative_PPL_increase_pct": 34.225316783402306,
+      "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42002167146"
+    },
+    "all_30": {
+      "layer_count": 30,
+      "delta_NLL": 0.5819277763366699,
+      "relative_PPL_increase_pct": 78.94848342534881,
+      "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42002167203"
+    },
+    "full_P128_identity": {
+      "reference_NLL": 0.033885370939970016,
+      "oracle_NLL": 0.03388044983148575,
+      "max_logit_abs_diff": 0.0038623809814453125,
+      "source_run": "https://github.com/micsedlab-afk/Cim_shared_prefix/actions/runs/42002167352",
+      "caveat": "Earlier eight-token repeat-passage control, not directly comparable with nonrepeated 31-target policy comparisons"
+    }
+  },
+  "source_silicon_macro_geometry": {
+    "llama_8b_native_P2048_M64_signed_K_macros": 4096,
+    "llama_8b_native_P2048_M64_FP16_V_sram_macros": 128,
+    "llama_8b_native_P2048_M64_metadata_sram_macros": 2,
+    "llama_8b_native_P2048_M64_macro_only_area_mm2": 14.274279452054795,
+    "naive_P2048_M64_positions_ratio": 32,
+    "quality_label": "hypothetical Llama geometry only; no Llama8B compressed-prefix inference"
+  },
+  "scope_limits": [
+    "One 135M checkpoint, one P128 prefix, three authored domains and 31 heldout targets: no confidence intervals or publication-ready generalization.",
+    "Layer selection requires real model inference and is calibrated offline; calibration overhead must be amortized over requests sharing a prefix.",
+    "GPU fallback was exact software attention executed on CPU; GPU speed and energy not measured.",
+    "Signed Q4K4 math is ideal, not a characterized Sinangil O4 ADC response.",
+    "Only K/V/metadata complete macro areas are accounted; digital/control/programming, centroid assignment and interconnect have no area/performance evidence.",
+    "Count-weighted centroid attention and softmax suffix fusion derive from prior art (Multipole Attention and Hydragen). Novelty would depend on the joint physical-aware quality admission and competitive baseline evidence.",
+    "Neither Llama8B quality, OPT, Mistral model inference, nor full decoder speedup shown."
+  ]
+}
