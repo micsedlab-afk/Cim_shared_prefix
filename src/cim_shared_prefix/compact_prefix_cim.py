@@ -33,7 +33,8 @@ class CentroidSummary:
         return int(len(self.counts))
 
 
-def cluster_prefix(keys, values, representatives:int, iterations:int=8,\n                   value_storage:str="fp16")->CentroidSummary:
+def cluster_prefix(keys, values, representatives:int, iterations:int=8,
+                   value_storage:str="fp16")->CentroidSummary:
     """Deterministic farthest-point initialization and Lloyd centroids.
 
     Keys and values are *post-RoPE* and share KV-head identity. No positional
