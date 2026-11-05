@@ -19,7 +19,7 @@ class CompactPrefixTests(unittest.TestCase):
         keys=self.rng.normal(size=(64,64)).astype(np.float32)
         values=self.rng.normal(size=(64,64)).astype(np.float32)
         q=self.rng.normal(size=(7,64)).astype(np.float32)
-        s=cluster_prefix(keys,values,64)
+        s=cluster_prefix(keys,values,64,value_storage='fp32')
         x,l=exact_prefix_context(q,keys,values)
         y,m=centroid_prefix_context(q,s)
         np.testing.assert_allclose(x,y,atol=1e-6,rtol=1e-6)
@@ -32,7 +32,7 @@ class CompactPrefixTests(unittest.TestCase):
         k=np.repeat(base,16,axis=0)
         v=self.rng.normal(size=(64,64)).astype(np.float32)
         q=self.rng.normal(size=(12,64)).astype(np.float32)
-        s=cluster_prefix(k,v,4)
+        s=cluster_prefix(k,v,4,value_storage='fp32')
         exact,el=exact_prefix_context(q,k,v)
         avg,al=centroid_prefix_context(q,s)
         np.testing.assert_allclose(exact,avg,atol=2e-6,rtol=2e-6)
@@ -49,6 +49,18 @@ class CompactPrefixTests(unittest.TestCase):
         y,m=centroid_prefix_context(q,s)
         np.testing.assert_allclose(x,y,atol=1e-6,rtol=1e-5)
         np.testing.assert_allclose(l,m,atol=1e-6,rtol=1e-5)
+
+    def test_stored_FP16_V_and_quantization_scales_are_rounded(self):
+        k=self.rng.normal(size=(128,128)).astype(np.float32)
+        v=self.rng.normal(size=(128,128)).astype(np.float32)
+        summ=cluster_prefix(k,v,64)
+        self.assertEqual(summ.value_storage,"fp16")
+        np.testing.assert_array_equal(summ.values.astype(np.float16).astype(np.float32),summ.values)
+        np.testing.assert_array_equal(summ.key_scale.astype(np.float16).astype(np.float32),summ.key_scale)
+        exact=cluster_prefix(k,v,64,value_storage="fp32")
+        self.assertGreater(float(np.max(np.abs(summ.values-exact.values))),0.0)
+        with self.assertRaisesRegex(ValueError,"value storage"):
+            cluster_prefix(k,v,64,value_storage="int8_fake")
 
     def test_signed_q4_is_separate_quantization_error(self):
         k=self.rng.normal(size=(128,128)).astype(np.float32)*.4
