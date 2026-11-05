@@ -48,6 +48,12 @@ class A100CompressedTests(unittest.TestCase):
         self.assertIsNone(x.hardware_speedup)
         self.assertFalse(x.digital_area_qualified)
         self.assertEqual(x.cim_macro_count_per_layer,128)
+        self.assertEqual(x.minimum_local_FP16_V_bytes_per_layer,131072)
+        self.assertEqual(x.digital_PV_MACs_per_layer,262144)
+        self.assertAlmostEqual(x.necessary_V_read_Bps_vs_HBM_source_us/1e12,0.8938082191780823,places=10)
+        self.assertAlmostEqual(x.necessary_V_read_Bps_vs_L2_source_us/1e12,3.0726053201970442,places=10)
+        self.assertAlmostEqual(x.necessary_digital_PV_MACps_vs_HBM_source_us/1e12,1.7876164383561646,places=10)
+        self.assertAlmostEqual(x.necessary_digital_PV_MACps_vs_L2_source_us/1e12,6.1452106403940885,places=10)
         self.assertEqual(x.cim_signed_unsigned_array_work_per_layer,1048576)
         self.assertAlmostEqual(x.cim_macro_only_optimistic_floor_us_per_layer,
                                0.044,places=12)
