@@ -42,6 +42,12 @@ class A100CompressedPoint:
     published_K_V_metadata_macro_area_mm2_if_all_layers: float
     selected_layer_K_V_metadata_macro_only_area_mm2: float
     cim_macro_count_per_layer: int
+    minimum_local_FP16_V_bytes_per_layer: int
+    digital_PV_MACs_per_layer: int
+    necessary_V_read_Bps_vs_HBM_source_us: float
+    necessary_V_read_Bps_vs_L2_source_us: float
+    necessary_digital_PV_MACps_vs_HBM_source_us: float
+    necessary_digital_PV_MACps_vs_L2_source_us: float
     cim_signed_unsigned_array_work_per_layer: int
     cim_macro_only_optimistic_floor_us_per_layer: float
     cim_macro_only_below_A100_HBM_unfused_source_model: bool
@@ -120,6 +126,13 @@ def point(batch: int = 1, prefix: int = 2048, reps: int = 64,
     allocation=allocate_cim(one_layer)
     physical_floor=cim_native_floor(one_layer,allocation)
     macro_floor_us=physical_floor.best_case_macro_compute_floor_s*1e6
+    # Independent necessary stage-rate conditions at the same completed
+    # context output endpoint; they do NOT subtract macro time or add
+    # serial latencies, since pipeline overlap has not been established.
+    vbytes=KV_HEADS*reps*D*FP16_WORD_BYTES
+    pv_macs=batch*QUERY_HEADS*reps*D
+    hbm_target=unfused_source_operator_us(batch,reps,A100_HBM_BPS)*1e-6
+    l2_target=unfused_source_operator_us(batch,reps,A100_L2_BPS)*1e-6
     return A100CompressedPoint(
         batch=batch,original_prefix=prefix,representatives=reps,
         selected_layers=selected_layers,
@@ -137,6 +150,12 @@ def point(batch: int = 1, prefix: int = 2048, reps: int = 64,
             selected_budget["signed_K_V_metadata_macro_area_mm2"]
             if selected_budget else 0.0),
         cim_macro_count_per_layer=allocation.macro_count,
+        minimum_local_FP16_V_bytes_per_layer=vbytes,
+        digital_PV_MACs_per_layer=pv_macs,
+        necessary_V_read_Bps_vs_HBM_source_us=vbytes/hbm_target,
+        necessary_V_read_Bps_vs_L2_source_us=vbytes/l2_target,
+        necessary_digital_PV_MACps_vs_HBM_source_us=pv_macs/hbm_target,
+        necessary_digital_PV_MACps_vs_L2_source_us=pv_macs/l2_target,
         cim_signed_unsigned_array_work_per_layer=physical_floor.native_unsigned_mav_per_token,
         cim_macro_only_optimistic_floor_us_per_layer=macro_floor_us,
         cim_macro_only_below_A100_HBM_unfused_source_model=(
