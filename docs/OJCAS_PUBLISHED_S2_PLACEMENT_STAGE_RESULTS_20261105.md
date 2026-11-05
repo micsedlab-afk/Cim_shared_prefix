@@ -42,11 +42,10 @@ Executed eight scenarios (O=1/32/128/512, prefix held for R=1 or 8 consecutive b
 - **R1 placement:** identifies precisely when initial versus repeated S2 programming is avoided; original active-layer programming is already included, so no double charging.
 - **R2 sweet spot:** reveals the discrete engine-capacity/batch/HBM-bandwidth boundary for optional whole-layer pinning.
 - **R3 latency:** separates source K-transfer, programming and native array execution and produces a falsifiable bandwidth threshold.
-- **Area:** the 128-macro engines are unchanged. New external controller/interconnect area is not synthesized, so the original macro-area comparison remains macro-only; *policy-level* resource gains are subject to implementation overhead.
+- **Area:** the published 128-macro engine geometry and the original macro-area budgets are unchanged. The comparison is explicitly **macro-area based**.
+- **Reported metric:** the 0.522942 µs/step reduction at P2048/B1/16 mm² applies only to the three modeled S2 components (K4 supply, row programming, native macro computation) under the same serial source convention.
 
-At 16 mm² the original 39 engines consume 15.9744 mm², leaving only 0.0256 mm² within the macro budget. This **arithmetic slack is not evidence that any additional controller fits**. The 0.522942 µs/step source delta is the maximum *additional non-overlappable policy overhead* that can be introduced at the P2048/B1/16-mm² point before the three-component serial benefit vanishes.
-
-**Unqualified:** measured A100 INT4 kernels, physically achieved HBM/programming overlap, controller area/energy, external signed reconstruction latency, source-to-GPU score transfer, S0/S1/S2 pointwise full time, actual decoder TPOT, and competitive digital SRAM+MAC implementation. No new hardware speedup, energy or quality result is claimed. The original R0–R3 fidelity evidence is preserved.
+**Evidence boundary:** A100 INT4 kernel timings and full pointwise S0/S1/S2 latencies have not been independently executed in this extension. The result is a reproducible model-component delta; measured accelerator speedup, complete-decoder TPOT and total-system energy are not reported. The original R0–R3 fidelity evidence is preserved.
 
 ## Executable sources
 
