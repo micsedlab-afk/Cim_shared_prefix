@@ -25,7 +25,7 @@ class OJCAS728AuditTests(unittest.TestCase):
                             x["primary_A100_INT4_source_operator_time_s"] is None
                             for x in rows))
 
-    def test_signed_macro_engine_correction_all_original_area_budgets(self):
+    def test_optional_signed_bank_replication_per_original_area_budget(self):
         old=[area_capacity(a).paper_unsigned_tile_engine_count for a in AREAS_MM2]
         new=[area_capacity(a).corrected_signed_tile_engine_count_macro_only for a in AREAS_MM2]
         self.assertEqual(old,[2,4,7,9,14,19,29,39])

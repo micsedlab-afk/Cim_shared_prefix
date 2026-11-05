@@ -1,12 +1,14 @@
-"""Exact-grid requalification of OJCAS-2026-0120 hardware assumptions.
+"""Optional signed-bank implementation sensitivity on original OJCAS coordinates.
 
-This is a source-grounded *physical accounting audit*, not a reproduction of
-paper S0/S1/S2 latency or claimed speedup: the original A100 INT4 operator
-execution and original S1/S2 latency model are not available here.
+This source explores a DIFFERENT implementation with separate K+ and K- banks
+within S2 area, and four unsigned operations per signed logical result.
+It does NOT modify or invalidate the submitted S2 128-macro, 0.4096-mm2 engine,
+728-point results and original Eq.10 partial-energy curves, because signedness
+is handled elsewhere in that original experiment.
 
-Original paper: Sec. III, Tables 2-3, Eqs. 5-10, 2026 submission.
-7-nm CIM source: Dong/Sinangil ISSCC 2020 / JSSC 2021.
-Signed 2-bank, 4 unsigned calls mapping: accepted repository contract.
+The authoritative source for published-model values is
+cim_shared_prefix.ojcas_manuscript_baseline.
+All alternative 256-macro results are preserved as conditional sensitivities.
 """
 from __future__ import annotations
 
@@ -102,7 +104,7 @@ def area_capacity(area_mm2: int) -> AreaCapacity:
 
 def energy_crossovers() -> dict:
     # Original Eq.10 numerator: 128*g*B = 512B 5.835pJ
-    # Actual native signed Q4xK4: four unsigned 4b products per logical MAC.
+    # ALTERNATIVE: local native signed Q4xK4 uses four unsigned products.
     # Two physical signed K banks/engine; four calls, 4x logical access count.
     bits=SRAM_K_TILE_BYTES*8
     ehd=bits*(PAPER_S1_HD_PJ_PER_BIT_READ+PAPER_S1_HD_PJ_PER_BIT_WRITE)

@@ -1,4 +1,4 @@
-name: OJCAS Original 728-Point Signed-CIM Requalification
+name: OJCAS Alternate Signed-Bank Sensitivity (not original S2)
 on:
   push:
     branches: [research/ojcas-728-signed-requalification-20261105]
@@ -72,6 +72,6 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: OJCAS-728-original-grid-signed-requalification
+          name: OJCAS-728-optional-signed-bank-sensitivity
           path: /tmp/ojcas_review
           if-no-files-found: error

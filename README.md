@@ -1,10 +1,12 @@
 # Cim_shared_prefix — OJCAS revision framework
 
+**Manuscript baseline (authoritative):** [OJCAS baseline lock](docs/OJCAS_MANUSCRIPT_BASELINE_LOCK_20261105.md). Preserve the submitted S0 A100 modeled INT4/S1-HD/S1-DP/S2 design (128 macros/engine, 0.4096 mm²; 728 points; 65.9% modeled favorable coverage; 1.97× stage maximum; original Eq.10 macro-energy). Signed Q4×K4 handling is outside the S2 128-macro core. Extra signed-bank storage in later source modules is an optional alternate physical mapping, not a mandatory correction. The submitted results must not be replaced by optional modeling extensions.
+
 Integrated source-grounded SRAM, SRAM-CIM and SRAM + digital-MAC analysis for shared-prefix LLM attention.
 
 ## Scope
 
-- **Primary GPU comparator:** A100 80GB FP16 HBM2e MAGMA/LLMCompass source model, preserving original native GQA and byte-correct operator counts. H100 measurements belong to a separate calibration study and must never substitute for A100.
+- **Original S0 GPU comparator:** the submitted A100 80GB 4-bit modeled score path; **additional** A100 FP16 HBM2e MAGMA/LLMCompass analysis is a distinct precision configuration. Do not substitute H100, FP16 or unrelated kernels for the manuscript's S0.
 - **Separate two architectural endpoints:** (i) completed signed Q4K4 prefix QK scores at scale/softmax, and (ii) optional prefix context + logsumexp returned after FP16-V SRAM, streaming softmax and digital PV. The two have different area, bytes and latency and must not be conflated.
 - Evaluate exact-prefix and compressed-prefix alternatives on the GPU as well as CIM; a compressed FP16 GPU operator source model is not a numerical substitute for matched Q4K4 GPU execution.
 - Compare GPU, SRAM-only and SRAM-CIM at fully documented modeled area. Include SRAM+digital MAC only as a matched-area implementation when complete comparable physical area evidence exists; otherwise publish a conditional digital break-even threshold.
@@ -39,7 +41,7 @@ Workstation-side code/results may supersede repository snapshots when identified
 
 - Every stage reports its endpoint, units, evidence source, assumption class and overlap policy.
 - Complete scores must include any signed/multi-partial merge before softmax.
-- Signed mapping expands K storage and array evaluations according to the actual numerical mapping.
+- Signed processing/reconstruction is handled outside the submitted 128-macro S2 core. Count additional banks/evaluations only for explicitly distinct physical implementations; maintain separate accounting without overwriting original results.
 - Budget includes macros and any support logic charged outside published macro-area figures.
 - No fabricated measured times, PPL, power, or foundry area estimates.
 - GPU-only and end-to-end numbers are labeled calibrated, modeled, bounded, or measured as appropriate.

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Reviewer R1/R3 necessary resource-rate screen, exact original 728 coordinates.
+"""OPTIONAL K+/K- on-macro replication sensitivity on original 728 axes.
+
+This uses a separate 256-macro signed-bank embodiment, NOT the submitted
+128-macro OJCAS S2. All numbers are conditional interface-rate scenarios and
+do not revise original 728 point speedups or original macro-energy results.
 
 1 TB/s is an explicitly UNQUALIFIED common upper-rate sensitivity. Program
 writes and GPU partial-score link are assumed independent, enabling overlap;
