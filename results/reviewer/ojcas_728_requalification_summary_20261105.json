@@ -178,5 +178,18 @@
       "two_d64_partial_link_us_per_token_at_rate_sensitivity": 2147.483648
     },
     "qualified_GPU_baseline": false
-  }
+  },
+  "architectural_scope": "ALTERNATIVE_ON_MACRO_SIGNED_BANKS_ONLY; NOT SUBMITTED S2",
+  "original_manuscript_authoritative": {
+    "engine_macros": 128,
+    "engine_macro_area_mm2": 0.4096,
+    "sign_handling": "outside submitted SRAM-CIM macro core",
+    "728_point_results": "preserved from manuscript; not replaced by this counterfactual",
+    "original_partial_energy_crossings_B": {
+      "S1_HD": 40.85689802913453,
+      "S1_DP": 25.44644387317909
+    },
+    "authoritative_doc": "docs/OJCAS_MANUSCRIPT_BASELINE_LOCK_20261105.md"
+  },
+  "notes_for_interpretation": "Every 256-macro, 4x-energy and 64MiB programming statement below applies solely to this separate signed-bank replication scenario and cannot be substituted for original S2. Published-model results remain authoritative."
 }
