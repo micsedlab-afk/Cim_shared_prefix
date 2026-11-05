@@ -1,0 +1,51 @@
+name: Frozen WikiText Quality Generalization
+on:
+  push:
+    branches: [research/wikitext-heldout-qualification-20261105]
+    paths:
+      - 'scripts/evaluate_frozen_wikitext_generalization.py'
+      - '.github/workflows/frozen-wikitext-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-pretrained-wikitext-heldout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned CPU source inference packages
+        run: |
+          python -m pip install 'numpy==1.26.4' 'transformers==4.46.3' 'safetensors>=0.4,<0.6' 'huggingface_hub>=0.26,<0.32' 'pyarrow==18.1.0'
+          python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+      - name: Validate source syntax
+        run: python -m py_compile scripts/evaluate_frozen_wikitext_generalization.py
+      - name: Run frozen-policy 12-window WikiText test with real pretrained weights
+        run: |
+          python scripts/evaluate_frozen_wikitext_generalization.py \
+            --threads 4 --out /tmp/wikitext_frozen_dispatch.json
+          python - <<'PY'
+          import json, math
+          z=json.load(open('/tmp/wikitext_frozen_dispatch.json'))
+          assert z['status']=='ACTUAL_PRETRAINED_CPU_INFERENCE'
+          assert z['heldout_targets']==372 and z['window_count']==12
+          assert z['admitted_layers']==[12,13,21,27]
+          assert math.isfinite(z['strict_four']['mean_delta_NLL'])
+          assert math.isfinite(z['first_four']['mean_delta_NLL'])
+          assert z['macro_only_area_mm2']>0
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frozen-135m-wikitext2-heldout-quality-results
+          path: /tmp/wikitext_frozen_dispatch.json
+          if-no-files-found: warn

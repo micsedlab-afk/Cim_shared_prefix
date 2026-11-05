@@ -1,0 +1,60 @@
+name: Frozen 32x Compression Quality Stress Test
+on:
+  push:
+    branches: [research/wikitext-heldout-qualification-20261105]
+    paths:
+      - '.github/workflows/frozen-p2048-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-p2048-m64-pretrained:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '4'
+      OPENBLAS_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact pretrained source dependencies
+        run: |
+          python -m pip install 'numpy==1.26.4' 'transformers==4.46.3' 'safetensors>=0.4,<0.6' 'huggingface_hub>=0.26,<0.32' 'pyarrow==18.1.0'
+          python -m pip install 'torch==2.5.1' --index-url https://download.pytorch.org/whl/cpu
+      - name: Test 32x centroid compression on 6 independent WikiText-2 test windows
+        run: |
+          python - <<'PY'
+          import argparse, json, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('scripts').resolve()))
+          import evaluate_frozen_wikitext_generalization as experiment
+          # Predeclared independent long-context protocol; no retuning of selected layers.
+          experiment.P=2048
+          experiment.WINDOW_COUNT=6
+          experiment.OFFSET_START=4096
+          experiment.OFFSET_STRIDE=8192
+          out=Path('/tmp/wikitext_P2048_M64_frozen_dispatch.json')
+          experiment.evaluate(argparse.Namespace(threads=4,out=out))
+          j=json.loads(out.read_text())
+          assert j['status']=='ACTUAL_PRETRAINED_CPU_INFERENCE'
+          assert j['prefix']==2048 and j['centroids']==64
+          assert j['window_count']==6 and j['heldout_targets']==186
+          assert j['admitted_layers']==[12,13,21,27]
+          print('COMPRESSION_STRESS_SUMMARY '+json.dumps({
+            'ratio':32,
+            'mean_strict_delta_NLL':j['strict_four']['mean_delta_NLL'],
+            'mean_fixed_delta_NLL':j['first_four']['mean_delta_NLL'],
+            'paired_ci':j['strict_minus_first']['mean_delta_NLL_window_bootstrap_95ci']
+          },sort_keys=True),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 135m-P2048-M64-32x-frozen-quality-stress
+          path: /tmp/wikitext_P2048_M64_frozen_dispatch.json
+          if-no-files-found: warn
