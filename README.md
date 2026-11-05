@@ -2,23 +2,23 @@
 
 **Manuscript baseline (authoritative):** [OJCAS baseline lock](docs/OJCAS_MANUSCRIPT_BASELINE_LOCK_20261105.md). Preserve the submitted S0 A100 modeled INT4/S1-HD/S1-DP/S2 design (128 macros/engine, 0.4096 mm²; 728 points; 65.9% modeled favorable coverage; 1.97× stage maximum; original Eq.10 macro-energy). Signed Q4×K4 handling is outside the S2 128-macro core. Extra signed-bank storage in later source modules is an optional alternate physical mapping, not a mandatory correction. The submitted results must not be replaced by optional modeling extensions.
 
-Integrated source-grounded SRAM, SRAM-CIM and SRAM + digital-MAC analysis for shared-prefix LLM attention.
+Source-grounded SRAM versus SRAM-CIM shared-prefix QKᵀ evaluation, anchored to the original OJCAS S0/S1-HD/S1-DP/S2 macro-area comparison.
 
 ## Scope
 
 - **Original S0 GPU comparator:** the submitted A100 80GB 4-bit modeled score path; **additional** A100 FP16 HBM2e MAGMA/LLMCompass analysis is a distinct precision configuration. Do not substitute H100, FP16 or unrelated kernels for the manuscript's S0.
 - **Separate two architectural endpoints:** (i) completed signed Q4K4 prefix QK scores at scale/softmax, and (ii) optional prefix context + logsumexp returned after FP16-V SRAM, streaming softmax and digital PV. The two have different area, bytes and latency and must not be conflated.
 - Evaluate exact-prefix and compressed-prefix alternatives on the GPU as well as CIM; a compressed FP16 GPU operator source model is not a numerical substitute for matched Q4K4 GPU execution.
-- Compare GPU, SRAM-only and SRAM-CIM at fully documented modeled area. Include SRAM+digital MAC only as a matched-area implementation when complete comparable physical area evidence exists; otherwise publish a conditional digital break-even threshold.
+- Compare the original A100 S0, S1-HD, S1-DP and SRAM-CIM S2 on the paper's common published-macro area budgets and shared-prefix QKᵀ endpoint.
 - Include prefix placement/refill, mapping, signed arithmetic, reduction, score transport and complete decoder latency.
-- Classify all physical area evidence. Sensitivity parameters never qualify as physically comparable area. **No 7-nm synthesis and no invented digital-MAC area.**
+- Preserve the paper's **macro-area** scope and the distinction between source model parameters and measurements; do not present model sensitivities as measured acceleration.
 - Generate architectural comparisons and absolute numerical-quality evidence from preserved project data.
 
 ## Frozen ladder
 
 1. **L0** Common geometry, provenance, units and physical-accounting contracts.
 2. **L1** System path: placement, refill, score output/merge and end-to-end TPOT.
-3. **L2** Iso-area: SRAM/6T/8T, signed SRAM-CIM and digital MAC; constrained allocation.
+3. **L2** Original macro-area comparison: SRAM/6T/8T and SRAM-CIM under the submitted allocation budgets.
 4. **L3** Quality and model profiles: archived R0–R3 results; suffix/GQA/MHA sensitivity.
 5. **L4** Integrate L1–L3; regenerate the architecture sweep; publication figures/tables; reviewer responses.
 
@@ -42,7 +42,7 @@ Workstation-side code/results may supersede repository snapshots when identified
 - Every stage reports its endpoint, units, evidence source, assumption class and overlap policy.
 - Complete scores must include any signed/multi-partial merge before softmax.
 - Signed processing/reconstruction is handled outside the submitted 128-macro S2 core. Count additional banks/evaluations only for explicitly distinct physical implementations; maintain separate accounting without overwriting original results.
-- Budget includes macros and any support logic charged outside published macro-area figures.
+- Report area consistently as the published complete-macro area used by the original manuscript.
 - No fabricated measured times, PPL, power, or foundry area estimates.
 - GPU-only and end-to-end numbers are labeled calibrated, modeled, bounded, or measured as appropriate.
 
