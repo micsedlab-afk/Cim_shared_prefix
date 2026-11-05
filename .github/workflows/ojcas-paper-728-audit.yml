@@ -1,0 +1,47 @@
+name: OJCAS Original 728-Point Signed-CIM Requalification
+on:
+  push:
+    branches: [research/ojcas-728-signed-requalification-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-grid-source-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and test exact submitted-paper geometry and signed corrections
+        run: |
+          python -m compileall -q src/cim_shared_prefix/ojcas_paper_728_audit.py scripts/run_ojcas_728_requalification.py
+          python -m unittest -v tests.test_ojcas_728_requalification
+      - name: Execute the complete 728-coordinate paper-grid physical-accounting audit
+        run: |
+          python scripts/run_ojcas_728_requalification.py --out-dir /tmp/ojcas_review
+          python - <<'PY'
+          import csv,json,math
+          from pathlib import Path
+          d=Path('/tmp/ojcas_review')
+          j=json.loads((d/'ojcas_728_signed_macro_audit.json').read_text())
+          with (d/'ojcas_728_signed_macro_audit.csv').open() as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==728 and j['executed_coordinates']==728
+          assert j['qualified_INT4_A100_GPU_stage_times']==0
+          assert j['requalified_original_S2_speedup_coordinates']==0
+          assert j['qualified_full_decoder_TPOT']==0
+          assert j['full_chip_isoarea_qualified'] is False
+          assert all(r['corrected_qualified_S2_speedup']=='' for r in rows)
+          assert sum(j['original_manuscript_evidence']['reported_S2_win_counts_by_area_PAPER_ONLY'].values())==276
+          e=j['partial_macro_energy_recalculation']
+          assert e['access_count_correction_factor']==4.0
+          assert math.isclose(e['corrected_HD_nominal_energy_crossing_B'],10.214224507283632)
+          assert math.isclose(e['corrected_DP_nominal_energy_crossing_B'],6.361610968294772)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OJCAS-728-original-grid-signed-requalification
+          path: /tmp/ojcas_review
+          if-no-files-found: error
