@@ -1,0 +1,45 @@
+name: OJCAS Original 128-Macro Placement Ablation
+on:
+  push:
+    branches: [research/ojcas-original-engine-placement-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preserve-and-extend-paper:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original paper and alternative placement remain separate
+        run: |
+          python -m compileall -q src/cim_shared_prefix/ojcas_placement_extension.py scripts/run_ojcas_placement_ablation.py
+          python -m unittest -v tests.test_ojcas_manuscript_baseline tests.test_ojcas_placement_extension
+      - name: Execute full 728-point original-S2 placement policy ablation
+        run: |
+          python scripts/run_ojcas_placement_ablation.py --out-dir /tmp/ojcas_placement
+          python - <<'PY'
+          import csv,json
+          from pathlib import Path
+          d=Path('/tmp/ojcas_placement')
+          m=json.loads((d/'original_728_placement_ablation.json').read_text())
+          with (d/'original_728_placement_ablation.csv').open() as f:
+              rows=list(csv.DictReader(f))
+          assert len(rows)==728
+          assert m['endpoint'].startswith('original shared-prefix QK')
+          assert m['original_S2_728_stage_results'].startswith('preserved unchanged')
+          assert m['evidence_class'].startswith('exact area/mapping')
+          assert {r['original_engine_macros'] for r in rows} == {'128'}
+          assert not any(r['new_policy_measured_TPOT'] for r in rows)
+          assert not any(r['original_manuscript_S2_stage_speedup'] for r in rows)
+          ref=next(p for p in m['reference_points'] if p['area']==8 and p['batch']==1)
+          assert ref['E']==19 and ref['selected_k']==1
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper-S2-original-128macro-placement-ablation
+          path: /tmp/ojcas_placement
+          if-no-files-found: error
