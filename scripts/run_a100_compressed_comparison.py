@@ -26,8 +26,7 @@ def run(path:Path):
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n")
-    print(json.dumps({"status":"EXECUTED_A100_SOURCE_MODELS_NO_GPU_MEASUREMENTS","B1":rows[0],
-        "case_count":len(rows)},sort_keys=True))
+    print("A100_COMPRESSED_SOURCE_RESULT "+json.dumps(payload,sort_keys=True))
     return payload
 
 if __name__=="__main__":
