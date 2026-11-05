@@ -134,6 +134,8 @@ def replace_attention_prefix(model, P:int, M_by_layer:list[int],mode:str):
     handles=[]
     for lid,layer in enumerate(model.model.layers):
         M=int(M_by_layer[lid])
+        if M==0:
+            continue  # exact pretrained GPU attention; no CIM data stored
         def mk_hook(mcount):
             def hook(mod,args,kwargs,out):
                 hidden=kwargs.get("hidden_states")
