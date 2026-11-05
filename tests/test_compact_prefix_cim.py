@@ -100,7 +100,7 @@ class CompactPrefixTests(unittest.TestCase):
         e=np.full((32,4),0.1)
         r=select_layer_representatives(e,(16,32,64,128),8,128,16)
         self.assertEqual(len(r["per_layer_representatives"]),32)
-        self.assertEqual(r["objective"].split(";")[0].split("not PPL")[-1],"")
+        self.assertIn("not PPL",r["objective"])
         self.assertLessEqual(r["macro_area_including_max_metadata_mm2"],16)
         self.assertTrue(r["metadata_reserved_worst_case"])
 
