@@ -3,17 +3,17 @@
 
 ## Source lock and implementation status
 
-The trusted eight-page manuscript, *Where Is the Sweet Spot for SRAM-CIM in Shared-Prefix LLM Attention?*, is the immutable numerical baseline. The original source-model stage results, area accounting and real Llama R0–R3 quality experiments are accepted; no reconstruction or rerun of the 728 points is requested. The integrated GitHub version is \`integration/final-framework\` at \`e93392ecd741\`; the prior revision text is in \`docs/TCASAI_SOURCE_ANCHORED_MANUSCRIPT_AUDIT_AND_PATCH_20261106.md\`.
+The trusted eight-page manuscript, *Where Is the Sweet Spot for SRAM-CIM in Shared-Prefix LLM Attention?*, is the immutable numerical baseline. The original source-model stage results, area accounting and real Llama R0–R3 quality experiments are accepted; no reconstruction or rerun of the 728 points is requested. The integrated GitHub version is `integration/final-framework` at `e93392ecd741`; the prior revision text is in `docs/TCASAI_SOURCE_ANCHORED_MANUSCRIPT_AUDIT_AND_PATCH_20261106.md`.
 
-**Applied to this TETC revision branch:** complete replacement/insert text in \`docs/TETC_READY_TO_PASTE_20261108.tex\`, verified new bibliography entries in \`docs/TETC_NEW_REFERENCES_20261108.bib\`, and an editable replacement architectural Figure 1 in \`docs/figures/tetc_architecture_comparison.svg\`. Original experimental code, data, and manuscript figures have not been altered. The original editable LaTeX project is not part of this repository or the accessible manuscript attachments; therefore, the replacements are source-anchored patches awaiting application to the author's original \`.tex\`, rather than a fabricated modified main.tex.
+**Applied to this TETC revision branch:** complete replacement/insert text in `docs/TETC_READY_TO_PASTE_20261108.tex`, verified new bibliography entries in `docs/TETC_NEW_REFERENCES_20261108.bib`, and an editable replacement architectural Figure 1 in `docs/figures/tetc_architecture_comparison.svg`. Original experimental code, data, and manuscript figures have not been altered. The original editable LaTeX project is not part of this repository or the accessible manuscript attachments; therefore, the replacements are source-anchored patches awaiting application to the author's original `.tex`, rather than a fabricated modified main.tex.
 
 ### Scientific contract — fixed
 
 - **Four configurations:** S0 LLMCompass-predicted A100 INT4; S1-HD 7-nm 6T SRAM, S1-DP 7-nm 2RW 8T SRAM; S2 fabricated 7-nm SRAM-CIM source macro with **128 macros per engine = 0.4096 mm² published-macro area**. Original external sign handling and 4-bit source timing assumptions remain unchanged.
-- **Comparison:** shared-prefix \`QK^T\` *stage latency*, not complete attention, not decoder TPOT. Same added published-macro area. Conventional comparator is \`min(S0,S1-HD,S1-DP)\` for each configuration.
-- **Grid:** 13 B × 7 prefix lengths × 8 areas = 728. At areas \`[1,2,3,4,6,8,12,16]\` mm² the original favorable counts per 91 shapes are \`[0,11,14,22,52,60,60,57]\`. At both **8 and 12 mm², 60/91 = 65.9%**. The 16-mm² count is 57/91 = 62.6%. The **maximum individual modeled QK-stage speedup 1.97×** is at **B=128, prefix=32k, A=16 mm²**. Coverage is a uniformly sampled-grid count, not measured serving frequency or a universally optimal area.
+- **Comparison:** shared-prefix `QK^T` *stage latency*, not complete attention, not decoder TPOT. Same added published-macro area. Conventional comparator is `min(S0,S1-HD,S1-DP)` for each configuration.
+- **Grid:** 13 B × 7 prefix lengths × 8 areas = 728. At areas `[1,2,3,4,6,8,12,16]` mm² the original favorable counts per 91 shapes are `[0,11,14,22,52,60,60,57]`. At both **8 and 12 mm², 60/91 = 65.9%**. The 16-mm² count is 57/91 = 62.6%. The **maximum individual modeled QK-stage speedup 1.97×** is at **B=128, prefix=32k, A=16 mm²**. Coverage is a uniformly sampled-grid count, not measured serving frequency or a universally optimal area.
 - **Energy:** original tile write+read S1 versus native compute S2 published-macro terms only; nominal crossings B≈41 (HD) / B≈25 (DP) are **not** total-system energy. Do not multiply four native operations into the *original* metric or replace the 128-macro core with a counterfactual 256-macro mapping.
-- **Numerics:** original real Llama-3.1-8B R0/R1/R2/R3, disjoint WikiText-2 evaluation and PG-19 held-out transfer; 96 original Llama evaluation units. P512 absolute PPL \`6.699/6.721/6.798/6.840\`; P2048 \`5.481/5.564/5.743/5.666\`; P16384 \`5.154/5.256/5.425/5.485\`. At P2k R2→R3 paired change –1.348%, 95% CI [–3.294%, +0.663%], crosses zero.
+- **Numerics:** original real Llama-3.1-8B R0/R1/R2/R3, disjoint WikiText-2 evaluation and PG-19 held-out transfer; 96 original Llama evaluation units. P512 absolute PPL `6.699/6.721/6.798/6.840`; P2048 `5.481/5.564/5.743/5.666`; P16384 `5.154/5.256/5.425/5.485`. At P2k R2→R3 paired change –1.348%, 95% CI [–3.294%, +0.663%], crosses zero.
 
 ## Exact action map
 
@@ -37,8 +37,8 @@ The trusted eight-page manuscript, *Where Is the Sweet Spot for SRAM-CIM in Shar
 | **MODIFY** | p.7 Section IV.C "The latency results identify three added-macro-area regimes..." through before Fig.6 paragraph | Block K | Publishable architectural decision implications with failure regimes |
 | **ADD** | p.7 Fig.6 paragraph after the first interpretation of plotted winners | Block L | S1-only roofline comparison ≠ full S0/S1 pointwise comparator |
 | **MODIFY** | pp.7–8 Section V Conclusion | Block M | Scope-limited findings, scientific takeaway |
-| **REPLACE FIGURE** | p.2 Fig.1 existing performance/intensity sketch | \`docs/figures/tetc_architecture_comparison.svg\` | Editable accurate S0/S1/S2 dataflow; no fabricated roofline |
-| **ADD CITATIONS** | Section I and II.C | \`docs/TETC_NEW_REFERENCES_20261108.bib\` | Two Sharma articles and S²-CIM, with publisher DOIs |
+| **REPLACE FIGURE** | p.2 Fig.1 existing performance/intensity sketch | `docs/figures/tetc_architecture_comparison.svg` | Editable accurate S0/S1/S2 dataflow; no fabricated roofline |
+| **ADD CITATIONS** | Section I and II.C | `docs/TETC_NEW_REFERENCES_20261108.bib` | Two Sharma articles and S²-CIM, with publisher DOIs |
 | **CHECK** | Page 8 acknowledgement, references, formatting | Below | Follow current IEEE author policies, accurate AI disclosure |
 
 **No numeric changes** to Eqs. (1)–(12), source Tables 1–5, or Figures 2–6.
@@ -54,17 +54,17 @@ The trusted eight-page manuscript, *Where Is the Sweet Spot for SRAM-CIM in Shar
 
 ## New architecture-specific interpretation of original results
 
-The 8–12-mm² tie maximizes *sampled beneficial coverage*, while the 16-mm² configuration contains the maximum individual modeled acceleration. Increasing area simultaneously enlarges complete S2 engine count and S1 resident K capacity. These benefits have different granularity and depend differently on \`B\` and \`L_p\`. At 8 mm², S1-HD's 27.84375 MiB holds approximately 86.9% of the 2k-token 32-MiB all-layer K image, but about 5.4% of the 32k-token 512-MiB image. Increasing \`B\` raises shared-prefix K reuse at fixed K footprint and also increases the GPU matrix dimension; consequently, neither larger batches nor longer prefixes imply a universal CIM win. This is a conditional *workload-aware design rule*, not a hardware demonstration. The full sampling grid contains 276 favorable cases of 728 (arithmetic aggregate, 37.9%), but **do not use this percentage as an application/serving prevalence estimate**.
+The 8–12-mm² tie maximizes *sampled beneficial coverage*, while the 16-mm² configuration contains the maximum individual modeled acceleration. Increasing area simultaneously enlarges complete S2 engine count and S1 resident K capacity. These benefits have different granularity and depend differently on `B` and `L_p`. At 8 mm², S1-HD's 27.84375 MiB holds approximately 86.9% of the 2k-token 32-MiB all-layer K image, but about 5.4% of the 32k-token 512-MiB image. Increasing `B` raises shared-prefix K reuse at fixed K footprint and also increases the GPU matrix dimension; consequently, neither larger batches nor longer prefixes imply a universal CIM win. This is a conditional *workload-aware design rule*, not a hardware demonstration. The full sampling grid contains 276 favorable cases of 728 (arithmetic aggregate, 37.9%), but **do not use this percentage as an application/serving prevalence estimate**.
 
 ## What remains to apply in the original author project
 
 - Insert Blocks A–M at the anchors above, **replacing** corresponding existing paragraphs to avoid repetition. Do not stack overlapping old/new discussions.
-- Import the two verified 2025 Sharma BibTeX entries and 2026 S²-CIM; retain original keys for Hydragen, CIM-Tuner, PAT, etc. \`TETC_READY_TO_PASTE.tex\` marks existing-citation aliases that must be mapped to the author's actual BibTeX keys.
-- Convert the paper from IEEE Access format (\`VOLUME XX, 2026\`) into the IEEE Computer Society / TETC journal template; keep author data, acknowledgement, all figures and references. Page count and publication fees must be checked in the current TETC submission portal.
+- Import the two verified 2025 Sharma BibTeX entries and 2026 S²-CIM; retain original keys for Hydragen, CIM-Tuner, PAT, etc. `TETC_READY_TO_PASTE.tex` marks existing-citation aliases that must be mapped to the author's actual BibTeX keys.
+- Convert the paper from IEEE Access format (`VOLUME XX, 2026`) into the IEEE Computer Society / TETC journal template; keep author data, acknowledgement, all figures and references. Page count and publication fees must be checked in the current TETC submission portal.
 - Check Fig.2 and Fig.6 axis/legend readability at final two-column width; no regeneration from screenshot or extrapolated pointwise samples.
 - Run LaTeX, bibliography and visual page-by-page diff from the original **editable** source after it becomes available. No full-source mutation claimed at this step.
 
-**Acceptance target for this editorial pass:** reader can identify the original experimental evidence, exactly what constitutes a win, why its boundary varies with \`B,L_p,A\`, how the analysis differs from prior generic CIM mapping studies, and the precise limits of QK-stage timing, macro-only area, partial energy, and held-out numerics.
+**Acceptance target for this editorial pass:** reader can identify the original experimental evidence, exactly what constitutes a win, why its boundary varies with `B,L_p,A`, how the analysis differs from prior generic CIM mapping studies, and the precise limits of QK-stage timing, macro-only area, partial energy, and held-out numerics.
 
 ## Verified external publication details
 
