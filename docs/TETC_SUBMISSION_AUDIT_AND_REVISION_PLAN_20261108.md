@@ -22,7 +22,7 @@ TETC is an appropriate technical venue because its Track 1 explicitly lists memo
 
 **Qualified/reusable:** original manuscript tables/figures as submitted-model evidence; reproduced original geometry and SRAM capacities; source-locked 728 coordinates and aggregate Table 5; executed 728-row *geometry/accounting* reconstruction; real archived Llama numerical-quality CSV with paired CIs; completed source-model placements and rate sensitivities; CI success on integrated HEAD e93392e (GitHub Actions, 6 November).
 
-**Critical gap:** the repository's reconstructed 728 rows intentionally set per-coordinate original stage times, win flags and speedups to null. The original per-coordinate timing/winner map was **not independently regenerated**. A successful 728-row geometry run is not validation of all 728 original comparisons. Recover the generating script/raw points or reproduce exactly using the frozen published assumptions; retain old claims as historical modeled observations until such reproduction is complete.
+**Evidence-source qualification:** the accepted submitted manuscript is the fixed source for all original 728 modeled results, including Table 5 and the 1.97× stage maximum. The reconstructed repository records geometry but not original per-coordinate time samples. **This revision does not rerun the original campaign or claim independent pointwise reproduction.** Source limitations remain disclosed in the methodology; original numerical results are retained.
 
 **Other gaps:** no real matched optimized Hydragen/PAT A100/CUDA benchmark; no physically qualified external signed-handling or periphery area/latency; no measured complete-decoder TPOT or chip energy; no OPT/Mistral real R0–R3 inference (0/96 each). No 7-nm synthesized digital SRAM+MAC comparator. These MUST NOT be represented as measured or completed.
 
@@ -48,13 +48,13 @@ TETC is an appropriate technical venue because its Track 1 explicitly lists memo
 ## Minimal defensible additions, ordered
 
 **P0 — scientific/reproducibility before submission**
-1. Recover exact original per-coordinate T_GPU, T_HD, T_DP, T_CIM and S2 favorable flag; run 728-point tests against Table 5 and named extrema. If source data irrecoverable, rebuild *original* frozen A100 INT4 and macro model and rerun with explicit provenance, documenting any discrepancies. Preserve original published claims for audit, do not silently substitute new numbers.
-2. Show a meaningful phase boundary: 2D B×Lp decision region for at least selected area points and interpret engine count versus SRAM capacity/GPU efficiency. Report coverage as a sampled-grid property, identify cases where conventional wins, and distinguish max win from max coverage.
+1. **Accept the trusted submitted analysis as the fixed numerical baseline.** Preserve the exact original Table 5 coverage, extrema and architecture assumptions. Do not fabricate pointwise timing, claim a new rerun, or replace original numbers with alternative source-model simulations.
+2. Explain the **existing** nonmonotonic favorable-region boundary using Table 5, the original Figures 2 and 6, and the documented SRAM-capacity examples. A new 2D pointwise map is optional only if actual original per-coordinate winner flags are later supplied; do not infer them from aggregates or images.
 3. Establish a **novelty gap paragraph and comparison table** against Sharma TETC 2025/ISPASS 2025 and the recent LLM/CIM papers, making no first-of-kind claims.
 4. Audit all original comparison assumptions and units: S1 cold placement vs S2 active programming, L2/HBM/GPU modeled utilization, Q4/K4 sign processing, score transport endpoint, macro-only area and energy. Present an explicit scope/assumption table.
 
 **P1 — tight robustness and editorial value**
-5. Once timings are available, evaluate at least one **small, labeled sensitivity overlay** for external S2 processing/transport and S1-placement amortization over output tokens. Show which favorable cases survive the assumed overhead; do not rewrite original 728 results.
+5. **Reuse already executed sensitivity evidence only as clearly separated contextual analysis**, e.g., the 117/728 residency Pareto count and S1 cold-placement bytes. Do not introduce speculative area/control overhead or assert an overlap with original winning points; no new sweep is required.
 6. Use source-supported GPU best-case/optimism sensitivity; only call it a competitive GPU baseline if actual matched optimized shared-prefix kernels are executed. PAT/Hydragen literature numbers with differing geometry/dtype are context, not speedups.
 7. Add original absolute PPL table with paired CI; no need to repeat all new OPT/Mistral quality or an entire end-to-end decoder study for this QK-boundary paper.
 8. Visually replace Figure 1 and repair figure legibility, placement and captions; compile with official TETC/IEEE Transactions style.
@@ -77,7 +77,7 @@ TETC is an appropriate technical venue because its Track 1 explicitly lists memo
 
 ## Decision gate
 
-**Journal fit: yes. Submission readiness: not yet.** Earliest scientifically defensible freeze requires (i) a genuinely reproducible original pointwise score-stage comparison, (ii) an explicit novelty contrast against 2025 TETC analytical CIM work, (iii) carefully scoped performance/area/energy and quality boundaries, (iv) readable TETC-compliant LaTeX layout. More hypothetical deadline sweeps, extra models without inference, uncontrolled digital synthesis and broad full-decoder claims are not prerequisites for this focused manuscript.
+**Journal fit: yes. Trusted results accepted without rerun.** The scientific revision is implemented as an anchored MODIFY/ADD/KEEP packet in `docs/TETC_MODIFY_ADD_KEEP_20261108.md`, source text in `docs/TETC_READY_TO_PASTE_20261108.tex`, new bibliography and editable Figure 1. Remaining mechanical tasks require the original editable LaTeX project: apply the blocks, compile with official journal style, and verify layout and references. A historical-source limitation must not be mislabeled as new pointwise reproducibility.
 
 ### Evidence links
 
@@ -92,3 +92,8 @@ TETC is an appropriate technical venue because its Track 1 explicitly lists memo
 - ISPASS iso-area CIM: https://doi.org/10.1109/ISPASS64960.2025.00056
 - CIM-Tuner: https://doi.org/10.23919/DATE69613.2026.11539276
 - S²-CIM: https://doi.org/10.1109/TCSI.2026.3742618
+
+
+## 8 November author decision and procedural note
+
+The authors accept the existing manuscript's modeled results as trusted and request no repeat campaign. This supersedes the earlier pointwise-recovery recommendation above. TETC's [special-section procedural guidelines](https://ieeecs-media.computer.org/media/publications/tetc/TETC%20SIS%20basic%20guidelines.pdf) (2019, Section A, page 2) expressly require the cover letter to disclose prior submissions/outcomes and provide earlier versions and reviews. Because this is a regular technical-track submission, verify the current portal-specific instructions; comply with any disclosure requirements. **No discussion of editorial history belongs in the scientific manuscript itself.** IEEE Computer Society's [general guidance](https://www.computer.org/publications/author-resources) separately prohibits concurrent submissions and requires truthful reporting of related material.
