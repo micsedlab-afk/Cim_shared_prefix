@@ -66,6 +66,10 @@ The 8–12-mm² tie maximizes *sampled beneficial coverage*, while the 16-mm² c
 
 **Acceptance target for this editorial pass:** reader can identify the original experimental evidence, exactly what constitutes a win, why its boundary varies with `B,L_p,A`, how the analysis differs from prior generic CIM mapping studies, and the precise limits of QK-stage timing, macro-only area, partial energy, and held-out numerics.
 
+## Submission disclosure outside the scientific paper
+
+TETC's published [special-section procedural regulations](https://ieeecs-media.computer.org/media/publications/tetc/TETC%20SIS%20basic%20guidelines.pdf) (Section A, p.2; historical 2019 document) explicitly require a cover-letter history of prior submissions/outcomes, and earlier versions plus reports where applicable. Confirm the current requirements for a **regular technical-track** submission; do not conceal information requested by the journal. This administrative disclosure is separate from manuscript scientific text, which contains no editorial history. The IEEE Computer Society's general [author guidance](https://www.computer.org/publications/author-resources) also prohibits concurrent submissions.
+
 ## Verified external publication details
 
 - IEEE TETC Track 1: https://www.computer.org/digital-library/journals/ec/technical-tracks
