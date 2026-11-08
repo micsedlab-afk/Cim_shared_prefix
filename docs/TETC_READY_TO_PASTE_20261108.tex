@@ -1,0 +1,132 @@
+% IEEE TETC -- source-anchored surgical manuscript replacements, 8 Nov 2026
+% FRAGMENT FILE: apply individual blocks to the AUTHORS' ORIGINAL LaTeX project.
+% Keep original equations, Tables 1--5, and numerical Figs. 2--6.
+% Existing citation keys below (EXISTING_*) must be mapped to actual author .bib keys.
+% NEW keys from docs/TETC_NEW_REFERENCES_20261108.bib:
+% Sharma2025WhatWhenWhere, Sharma2025Dataflow, Liu2026S2CIM.
+% No requirement to rerun original 728 modeled configurations.
+%
+% ================================================================
+% BLOCK A -- MODIFY existing ABSTRACT, p.1
+% ================================================================
+\begin{abstract}
+Shared-prefix decoding repeatedly applies concurrent queries to common key vectors, creating an architectural choice for added on-chip area: retaining shared-prefix keys in conventional SRAM or executing attention-score computation in SRAM compute-in-memory (CIM). This work characterizes the corresponding workload-dependent selection boundary at equal added published-macro area. An LLMCompass-predicted A100/HBM path (S0), high-density 6T SRAM (S1-HD), dual-port 2RW 8T SRAM (S1-DP), and a fabricated 7-nm SRAM-CIM macro model (S2) are compared for shared-prefix $QK^{\mathsf T}$ across 728 combinations of batch size, prefix length, and area budget. The conventional reference is the pointwise minimum of S0, S1-HD, and S1-DP. Under the specified 4-bit source timing model, S2 has lower $QK^{\mathsf T}$ latency at 60 of the 91 sampled workloads (65.9\%) at both 8 and 12\,mm$^2$; the maximum individual modeled speedup is 1.97$\times$ at 16\,mm$^2$. The variation reflects finite SRAM key residency, discrete CIM engine parallelism, and batch-dependent GPU utilization. We also quantify shared-prefix key traffic reduction and partial macro-level memory energy. Separate numerical-fidelity experiments on Llama-3.1-8B distinguish Q4/K4 quantization, ADC quantization, and characterized circuit response using frozen calibration and held-out WikiText-2 and PG-19 data. Relative to Q4/K4 arithmetic, the full CIM model increases WikiText-2 subset perplexity by approximately 1.8\% at 512 and 2k prefix tokens and 4.4\% at 16k. All reported speedups refer to the modeled shared-prefix $QK^{\mathsf T}$ stage.
+\end{abstract}
+
+% ================================================================
+% BLOCK B -- MODIFY Introduction p.1 paragraph starting
+% "At the hardware level, attention-oriented in-memory ..."
+% ending "...multi-request LLM inference."
+% ================================================================
+At the architectural level, the suitability of compute-in-memory (CIM) has been examined through analytic evaluation of computation, storage capacity, memory-hierarchy placement, and dataflow. Sharma \emph{et al.} studied what type of CIM to employ and when and where to integrate it for machine-learning matrix multiplication \cite{Sharma2025WhatWhenWhere}; their related iso-area study compared CIM dataflows with conventional compute arrays \cite{Sharma2025Dataflow}. CIM-Tuner extends the exploration of SRAM-CIM compute/storage sizing and mapping under area constraints \cite{EXISTING_CIM_TUNER}. These results establish constrained CIM architectural exploration as prior art. Shared-prefix LLM decoding adds distinct workload variables: a prefix-key working set reused by concurrent queries, grouped-query attention, and a conventional GPU path whose matrix utilization changes with batch size. These effects determine how the same added SRAM macro area can improve either key residency or in-memory score throughput.
+
+% ================================================================
+% BLOCK C -- ADD immediately before Introduction p.2:
+% "This work evaluates that comparison using four configurations..."
+% ================================================================
+The decision investigated here is the allocation of a fixed incremental published-macro-area budget between conventional SRAM key locality and SRAM-CIM shared-prefix score computation. The alternatives are compared at the same modeled $QK^{\mathsf T}$ endpoint, with the GPU/HBM path retained as a pointwise reference. The resulting favorable region is specific to the assumed macro characteristics, workload geometry, and timing model.
+
+% ================================================================
+% BLOCK D -- MODIFY original three contribution bullets, p.2
+% Insert ONLY the three \item lines inside the author's existing
+% list environment, or use this itemize as full replacement.
+% ================================================================
+\begin{itemize}
+\item An equal-added-published-macro-area comparison of modeled A100/HBM score computation, high-density SRAM, dual-port SRAM, and 7-nm SRAM-CIM for shared-prefix $QK^{\mathsf T}$, spanning 728 workload--area configurations and using the fastest conventional alternative at each point.
+\item A quantitative characterization of the favorable operating regions and their dependence on batch size, prefix length, SRAM key residency, discrete CIM engine counts, and conventional GPU utilization, accompanied by shared-prefix key-traffic and partial macro-energy analyses.
+\item A numerical-fidelity study on Llama-3.1-8B that separately evaluates post-RoPE Q4/K4 quantization, SRAM-CIM mapping with a 4-bit output ADC, and published circuit response, using frozen ADC calibration across disjoint WikiText-2 and PG-19 evaluations.
+\end{itemize}
+
+% ================================================================
+% BLOCK E -- MODIFY Section II.C final CIM-related paragraph, p.3
+% beginning "Attention-oriented CIM architectures..."
+% Keep earlier paragraphs on Hydragen/ChunkAttention/PAT/MoSKA.
+% ================================================================
+Prior architectural CIM analyses have characterized the general compute--storage allocation and dataflow problem. Sharma \emph{et al.} evaluated CIM integration choices for machine-learning matrix multiplication \cite{Sharma2025WhatWhenWhere} and an iso-area CIM-versus-conventional-compute comparison \cite{Sharma2025Dataflow}; CIM-Tuner addresses area-constrained SRAM-CIM sizing and mapping within accelerator templates \cite{EXISTING_CIM_TUNER}. For LLMs, prefix-aware GPU approaches including Hydragen and PAT exploit shared-key reuse without requiring new memory arithmetic \cite{EXISTING_HYDRAGEN,EXISTING_PAT}. Attention-oriented CIM systems including Ouroboros address KV placement and execution scheduling \cite{EXISTING_OUROBOROS}, while the fabricated 28-nm S$^2$-CIM demonstrates KV-sharing-aware CIM acceleration \cite{Liu2026S2CIM}. The present analysis isolates a narrower architectural allocation question: for the same shared-prefix $QK^{\mathsf T}$ workload and increment of published 7-nm macro area, when does a conventional GPU/SRAM path have lower modeled score-stage latency than SRAM-CIM? The pointwise comparison explicitly includes conventional SRAM key residency and the unchanged GPU path. Precision, macro area, and result endpoint differ from those in the cited implementation studies; no raw chip-energy or decoder-speedup ranking is inferred.
+
+% ================================================================
+% BLOCK F -- ADD after Eq.(4) and the existing "S_CIM>1" definition
+% ================================================================
+For each added area $A_{\mathrm{add}}$, the sampled favorable coverage is
+\begin{equation}
+ C_{\mathrm{fav}}(A_{\mathrm{add}})
+ =\frac{1}{91}\sum_{B\in\mathcal{B}}\sum_{L_p\in\mathcal{L}}
+ \mathbf{1}\!\left[T_{\mathrm{CIM}}(B,L_p,A_{\mathrm{add}})
+ <T_{\mathrm{conv}}(B,L_p,A_{\mathrm{add}})\right],
+ \label{eq:tetc_grid_coverage}
+\end{equation}
+where $|\mathcal{B}|=13$ and $|\mathcal{L}|=7$. This is the fraction of favorable configurations on the evaluated uniform $(B,L_p)$ grid; no serving-trace frequency distribution is assumed.
+
+% ================================================================
+% BLOCK G -- ADD after first A100/LLMCompass paragraph in III.A
+% ================================================================
+The A100 specifications define the modeled conventional 4-bit score path; the resulting latencies are predictions from the stated LLMCompass-based model, rather than measured GPU kernel times. The SRAM and SRAM-CIM execution models use published 7-nm macro characteristics together with the stated residency, tiling, and transfer assumptions. The area comparison counts published memory macros and excludes uncharacterized external physical implementation area. The separate numerical-fidelity experiment uses an R0 BF16 reference and does not constitute an INT4 GPU timing measurement.
+
+% ================================================================
+% BLOCK H -- ADD at III.A/III.B around original sentence
+% "prefix placement is completed before the timed decode interval"
+% (do not duplicate existing neighboring explanations).
+% ================================================================
+For S1, the shared-prefix K state is placed after prefill, and the initial placement is excluded from the timed decode interval. For S2, active-layer K transfer, row programming, SRAM-CIM execution, and GPU combination of the two $d=64$ score partials are included in the stated $T_{\mathrm{CIM}}$ model. The placement assumptions are part of the defined source-model comparison.
+
+% ================================================================
+% BLOCK I -- MODIFY two original overlapping IV.A paragraphs
+% immediately after Table 5 ("The complete coverage..." and
+% "Larger Lp increases...").
+% ================================================================
+Table~\ref{tab:original_table_5} identifies a nonmonotonic favorable region on the sampled workload grid. S2 has lower modeled $QK^{\mathsf T}$ latency than the pointwise fastest conventional alternative for 22/91 cases at 4\,mm$^2$, 52/91 at 6\,mm$^2$, and 60/91 at both 8 and 12\,mm$^2$; the count decreases to 57/91 at 16\,mm$^2$. These fractions describe equally weighted evaluated $(B,L_p)$ combinations and are not serving-request probabilities. Increasing area improves both the number of complete CIM engines and the conventional SRAM capacity available for prefix keys. Their competing effects, together with batch-dependent GPU matrix utilization, produce the observed favorable-region boundary. The 8--12-mm$^2$ plateau maximizes sampled favorable coverage; the maximum individual modeled QK-stage speedup of 1.97$\times$ occurs at $B=128$, $L_p=32$k and 16\,mm$^2$. The coverage maximum and the maximum-speedup operating point represent different design objectives.
+
+% NOTE: replace \ref{tab:original_table_5} with actual Table 5 label.
+
+% ================================================================
+% BLOCK J -- ADD immediately after first WikiText result paragraph
+% in IV.B (retains original Fig.5 and reported paired intervals).
+% ================================================================
+\begin{table}[t]
+\caption{Absolute perplexity on the held-out WikiText-2 evaluation subset
+(eight sequences; 1,024 scored tokens per configuration).}
+\label{tab:tetc_absolute_ppl}
+\centering
+\begin{tabular}{rcccc}
+\hline
+$L_p$ & R0 BF16 & R1 Q4/K4 & R2 ADC & R3 Circuit\\
+\hline
+512 & 6.699 & 6.721 & 6.798 & 6.840\\
+2k & 5.481 & 5.564 & 5.743 & 5.666\\
+16k & 5.154 & 5.256 & 5.425 & 5.485\\
+\hline
+\end{tabular}
+\end{table}
+Table~\ref{tab:tetc_absolute_ppl} gives the absolute perplexities underlying the relative effects in Fig.~5. These are held-out subset estimates, rather than complete-corpus perplexities. At $L_p=2$k, R3 has a lower point-estimate perplexity than R2 (5.666 versus 5.743). The paired R2-to-R3 relative-perplexity change is $-1.348\%$, with a 95\% confidence interval of $[-3.294\%,+0.663\%]$; the interval includes zero. The observed decrease does not establish a systematic benefit of the circuit-response characteristic. Pooled perplexity and median token-level $\Delta$NLL summarize different statistics and may move differently.
+
+% ================================================================
+% BLOCK K -- MODIFY Section IV.C opening (original "three regimes"
+% paragraphs), before its current Fig.6 interpretation.
+% ================================================================
+The modeled allocation boundary yields three design implications. First, conventional SRAM key residency becomes more effective when the shared-prefix working set fits the added storage budget. At 8\,mm$^2$, the 27.844-MiB S1-HD capacity corresponds to approximately 86.9\% of the 2k-token all-layer K image, but only about 5.4\% of the 32k-token image before tile granularity is applied. Second, the benefit of allocating area to CIM depends on complete engine counts and the number of prefix tile waves; additional area does not improve CIM and SRAM at the same rate. Third, higher batch size increases query reuse of the shared K data while also improving the utilization of the conventional GPU matrix operation. Consequently, the preferred configuration depends jointly on $(B,L_p,A_{\mathrm{add}})$, and neither the 8--12-mm$^2$ sampled coverage maximum nor a single batch threshold is a universal design rule. These implications apply to the model's shared-prefix score stage under its specified macro-area, data-placement, and bandwidth assumptions.
+
+% ================================================================
+% BLOCK L -- ADD in IV.C after the original Fig.6 S1 vs S2
+% description and before generic takeaways (avoid repetition).
+% ================================================================
+The S1 curves in Fig.~6 select between S1-HD and S1-DP only; the coverage counts in Table~5 instead compare S2 with the full pointwise minimum of S0, S1-HD, and S1-DP. Thus the plotted S1-versus-S2 crossovers should not be interpreted as a complete replacement for the three-way conventional reference at every grid point.
+
+% ================================================================
+% BLOCK M -- MODIFY full Conclusion (Section V pp.7--8)
+% ================================================================
+This study characterizes the workload-dependent tradeoff between conventional SRAM key residency and SRAM-CIM attention-score computation under equal added published-macro area. Across 728 modeled shared-prefix $QK^{\mathsf T}$ configurations, the lower-latency option changes with batch size, prefix length, and available area. SRAM-CIM is favorable against the pointwise fastest conventional reference in 60 of 91 sampled workload cases at both 8 and 12\,mm$^2$; favorable coverage decreases at 16\,mm$^2$, although that area contains the maximum individual modeled QK-stage speedup of 1.97$\times$. The comparison exposes the combined effects of finite key residency, discrete CIM engine parallelism, and conventional GPU utilization. A partial macro-energy analysis and a held-out Llama-3.1-8B numerical-fidelity study further characterize the operating assumptions and quantization costs. These findings provide source-model architectural guidance for choosing between additional SRAM storage and SRAM-CIM score computation for shared-prefix workloads. The reported timing benefits concern the modeled prefix $QK^{\mathsf T}$ stage, and the area and energy results retain their stated macro-level scope.
+
+% ================================================================
+% NEW Figure 1 insertion (after SVG exported to PDF from editable source)
+% \begin{figure*}[t]
+% \centering
+% \includegraphics[width=0.95\textwidth]{figures/tetc_architecture_comparison.pdf}
+% \caption{Architectural alternatives for the same shared-prefix
+% $QK^{\mathsf T}$ workload. S0 uses the modeled A100/HBM path;
+% S1-HD/DP uses additional conventional SRAM for prefix-K residency
+% while retaining GPU score computation; S2 uses added SRAM-CIM
+% engines with active-layer key programming and GPU partial-score
+% combination. Suffix attention and the remaining decoder use
+% conventional execution in all cases.}
+% \label{fig:tetc_architecture}
+% \end{figure*}
